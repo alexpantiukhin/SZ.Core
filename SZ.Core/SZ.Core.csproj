@@ -2,17 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Alexander Pantiukhin</Authors>
+    <Company>Alexander Pantiukhin</Company>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Al.Result" Version="1.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SZ.Core.Abstractions\SZ.Core.Abstractions.csproj" />
+    <PackageReference Include="SZ.Core.Abstractions" Version="1.0.1" />
+    <PackageReference Include="SZ.Core.Models" Version="1.0.2" />
   </ItemGroup>
 
 </Project>

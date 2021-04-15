@@ -2,18 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Alexander Pantiukhin</Authors>
+    <Company>Alexander Pantiukhin</Company>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Al.BlazorMultiDropDownList" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SZ.Core.Constants\SZ.Core.Constants.csproj" />
+    <PackageReference Include="SZ.Core.Constants" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
