@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -85,6 +86,26 @@ namespace SZ.Test.Core
             Assert.True(testPassHash == DBFactory.DB.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
                 "ѕри попытке смены парол€ неавторизованным пользователем должен остатьс€ старый пароль");
         }
+
+
+        /// <summary>
+        /// ѕопытка изменить пароль несуществующего пользовател€. ¬озвращена модель с ошибкой
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task CurrentUserAdmin_ChangeUserNo_ReturnErrorModel()
+        {
+            //Arrange
+            var environment = new TestEnvironment(Settings.Users.AdminUserName, true);
+            var userManager = new UserManager(environment, null, DBFactory);
+
+            //Act
+            var result = await userManager.ChangePasswordAsync(Guid.NewGuid());
+
+            //Assert
+            Assert.True(!string.IsNullOrWhiteSpace(result.UserMessage), "ѕопытка изменить пароль несуществующему пользователю должна возвращать модель с ошибкой");
+        }
+
     }
 
 
