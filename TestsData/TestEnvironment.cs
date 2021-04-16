@@ -11,7 +11,10 @@ namespace TestData
     public class TestEnvironment : ISZEnvironment
     {
         IIdentity Identity;
-        public TestEnvironment() : this(default(User), false) { }
+        /// <summary>
+        /// Пользователь не зашёл
+        /// </summary>
+        public TestEnvironment() : this(default(string), false) { }
 
         public TestEnvironment(User user, bool isAuth = false) : this(user.UserName, isAuth) { }
 
