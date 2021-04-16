@@ -9,8 +9,8 @@ namespace SZ.Core.Abstractions.Interfaces
 {
     public interface IUserManager
     {
-        Task<User> GetCurrentUserAsync(IDBFactory dbFactory);
-        Task<bool> IsAdminAsync(IDBFactory dbFactory, Guid userId);
-        Task<Result<string>> ChangePasswordAsync(IDBFactory dbFactory, Guid userId);
+        Task<User> GetCurrentUserAsync(SZDb db = null);
+        Task<bool> IsAdminAsync(Guid userId, SZDb db = null);
+        Task<Result<string>> ChangePasswordAsync(Guid userId, SZDb db = null);
     }
 }

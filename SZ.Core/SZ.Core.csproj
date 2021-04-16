@@ -5,11 +5,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Alexander Pantiukhin</Authors>
     <Company>Alexander Pantiukhin</Company>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SZ.Core.Abstractions" Version="1.0.1" />
+    <PackageReference Include="SZ.Core.Abstractions" Version="1.0.3" />
     <PackageReference Include="SZ.Core.Models" Version="1.0.2" />
   </ItemGroup>
 

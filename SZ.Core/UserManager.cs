@@ -17,56 +17,63 @@ namespace SZ.Core
     {
         readonly ISZEnvironment _environment;
         readonly ILogger _logger;
+        readonly IDBFactory _dBFactory;
 
         User CurrentUser = null;
 
         public UserManager(ISZEnvironment environment,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IDBFactory dBFactory)
         {
             _environment = environment;
             _logger = loggerFactory?.CreateLogger<UserManager>();
+            _dBFactory = dBFactory;
         }
 
 
-        public async Task<User> GetCurrentUserAsync(IDBFactory dbFactory)
+        public async Task<User> GetCurrentUserAsync(SZDb db = null)
         {
+            if (CurrentUser != null)
+                return CurrentUser;
+
+            db = db ?? _dBFactory.DB;
+
             var identity = await _environment.GetCurrentUserIdentityAsync();
 
             if (identity?.IsAuthenticated != true)
                 return null;
 
-            if (CurrentUser != null)
-                return CurrentUser;
-
-            CurrentUser = await dbFactory.DB
+            CurrentUser = await db
                 .Users
                 .FirstOrDefaultAsync(x => x.UserName == identity.Name);
 
             return CurrentUser;
         }
 
-        public async Task<bool> IsAdminAsync(IDBFactory dbFactory, Guid userId)
+        public async Task<bool> IsAdminAsync(Guid userId, SZDb db = null)
         {
-            return await dbFactory.DB.UserRoles
+            db = db ?? _dBFactory.DB;
+            return await db.UserRoles
                 .AnyAsync(x => x.UserId == userId
                 && x.RoleId == Settings.Roles.AdminId);
         }
 
-        public async Task<Result<string>> ChangePasswordAsync(IDBFactory dbFactory, Guid userId)
+        public async Task<Result<string>> ChangePasswordAsync(Guid userId, SZDb db = null)
         {
+            db = db ?? _dBFactory.DB;
             var result = new Result<string>(_logger);
 
-            var currentUser = await GetCurrentUserAsync(dbFactory);
+            var currentUser = await GetCurrentUserAsync(db);
 
             if (currentUser == null)
                 return result.AddError("Войдите в систему", $"Попытка смены пароля пользователю {userId} неавторизованным пользователем");
 
-            var isAdmin = await IsAdminAsync(dbFactory, currentUser.Id);
+            var isAdmin = await IsAdminAsync(currentUser.Id, db);
 
             if(!isAdmin && currentUser.Id != userId)
                 return result.AddError("Нет права смены пароля", $"Попытка смены пароля пользователю {userId} пользователем {currentUser.Id}, не имеющим на это прав");
 
-            var dbUser = await dbFactory.DB
+            var dbUser = await db
                 .Users.FindAsync(userId);
 
             if (dbUser == null)
@@ -78,7 +85,7 @@ namespace SZ.Core
 
             try
             {
-                var a = await dbFactory.DB.SaveChangesAsync();
+                var a = await db.SaveChangesAsync();
 
                 if (a == 0)
                 {

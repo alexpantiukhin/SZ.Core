@@ -34,10 +34,10 @@ namespace SZ.Test.Core
                 IsAuthenticated = true
             });
 
-            var userManager = new UserManager(environment, null);
+            var userManager = new UserManager(environment, null, dbFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(dbFactory, user1.Id);
+            var result = await userManager.ChangePasswordAsync(user1.Id);
 
             //Assert
             Assert.False(testPassHash == dbFactory.DB.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
@@ -56,10 +56,10 @@ namespace SZ.Test.Core
             var user1 = dbFactory.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
             var environment = new TestEnvironment(new TestIdentity { Name = user1.UserName, IsAuthenticated = true });
-            var userManager = new UserManager(environment, null);
+            var userManager = new UserManager(environment, null, dbFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(dbFactory, user1.Id);
+            var result = await userManager.ChangePasswordAsync(user1.Id);
 
             //Assert
             Assert.NotEqual(testPassHash, dbFactory.DB.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash);
@@ -78,10 +78,10 @@ namespace SZ.Test.Core
             string testPassHash = user1.PasswordHash;
             var environment = new TestEnvironment(new TestIdentity { Name = user1.UserName, IsAuthenticated = false });
 
-            var userManager = new UserManager(environment, null);
+            var userManager = new UserManager(environment, null, dbFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(dbFactory, user1.Id);
+            var result = await userManager.ChangePasswordAsync(user1.Id);
 
             //Assert
             Assert.True(!string.IsNullOrWhiteSpace(result.UserMessage), "Неавторизованный пользователь при попытке смены пароля должен получать ошибку");

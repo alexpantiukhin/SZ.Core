@@ -21,10 +21,10 @@ namespace SZ.Test.Core
             //Arrange
             var environment = new TestEnvironment(null);
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null);
+            var userManager = new UserManager(environment, null, db);
 
             //Act
-            var result = await userManager.IsAdminAsync(db, TestUsers.User1.Id);
+            var result = await userManager.IsAdminAsync(TestUsers.User1.Id);
 
             //Assert
             Assert.False(result);
@@ -40,11 +40,11 @@ namespace SZ.Test.Core
             //Arrange
             var environment = new TestEnvironment(null);
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null);
+            var userManager = new UserManager(environment, null, db);
             db.DB.AddUser(1);
 
             //Act
-            var result = await userManager.IsAdminAsync(db, TestUsers.User1.Id);
+            var result = await userManager.IsAdminAsync(TestUsers.User1.Id);
 
             //Assert
             Assert.False(result);
@@ -60,10 +60,10 @@ namespace SZ.Test.Core
             //Arrange
             var environment = new TestEnvironment(null);
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null);
+            var userManager = new UserManager(environment, null, db);
 
             //Act
-            var result = await userManager.IsAdminAsync(db, Settings.Users.AdminId);
+            var result = await userManager.IsAdminAsync(Settings.Users.AdminId);
 
             //Assert
             Assert.True(result);
