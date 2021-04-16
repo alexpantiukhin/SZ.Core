@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7F28FBC0
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestData", "TestsData\TestData.csproj", "{22506E9C-702F-42A5-83E3-DDF73A9E9630}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{2F5B412F-1AA6-44E7-9502-9DA78977B05B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.UserManager", "Test.UserManager\Test.UserManager.csproj", "{2F5B412F-1AA6-44E7-9502-9DA78977B05B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

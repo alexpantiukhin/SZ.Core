@@ -11,9 +11,16 @@ namespace TestData
     public class TestEnvironment : ISZEnvironment
     {
         IIdentity Identity;
-        public TestEnvironment(TestIdentity identity)
+        public TestEnvironment() : this(default(User), false) { }
+
+        public TestEnvironment(User user, bool isAuth = false) : this(user.UserName, isAuth) { }
+
+        public TestEnvironment(string userName = null, bool isAuth = false)
         {
-            Identity = identity;
+            if (string.IsNullOrWhiteSpace(userName))
+                return;
+
+            Identity = new TestIdentity { Name = userName, IsAuthenticated = isAuth };
         }
 
         public PasswordHasher<User> PasswordHasher { get; } = new PasswordHasher<User>();

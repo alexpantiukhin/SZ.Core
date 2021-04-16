@@ -70,14 +70,14 @@ namespace SZ.Core
 
             var isAdmin = await IsAdminAsync(currentUser.Id, db);
 
-            if(!isAdmin && currentUser.Id != userId)
+            if (!isAdmin && currentUser.Id != userId)
                 return result.AddError("Нет права смены пароля", $"Попытка смены пароля пользователю {userId} пользователем {currentUser.Id}, не имеющим на это прав");
 
             var dbUser = await db
                 .Users.FindAsync(userId);
 
             if (dbUser == null)
-                return result.AddError("ChangePassword: User not found");
+                return result.AddError($"Пользователь {userId} не найден");
 
             var newPass = GeneratePassword();
 
