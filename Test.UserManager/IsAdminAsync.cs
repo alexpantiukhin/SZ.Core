@@ -19,7 +19,7 @@ namespace SZ.Test.Core
         public async Task UserNotFoundReturnFalse()
         {
             //Arrange
-            var environment = new TestEnvironment(null);
+            var environment = new TestEnvironment();
             var db = new TestDBFactory();
             var userManager = new UserManager(environment, null, db);
 
@@ -38,7 +38,7 @@ namespace SZ.Test.Core
         public async Task UserNotAdminReturnFalse()
         {
             //Arrange
-            var environment = new TestEnvironment(null);
+            var environment = new TestEnvironment();
             var db = new TestDBFactory();
             var userManager = new UserManager(environment, null, db);
             db.DB.AddUser(1);
@@ -58,7 +58,7 @@ namespace SZ.Test.Core
         public async Task UserIsAdminReturnTrue()
         {
             //Arrange
-            var environment = new TestEnvironment(null);
+            var environment = new TestEnvironment();
             var db = new TestDBFactory();
             var userManager = new UserManager(environment, null, db);
 

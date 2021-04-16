@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>SZ.Test.Core.UserManager</AssemblyName>
+    <AssemblyName>Test.UserManager</AssemblyName>
 
-    <RootNamespace>SZ.Test.Core.UserManager</RootNamespace>
+    <RootNamespace>Test.UserManager</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
