@@ -13,7 +13,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.5" />
-    <PackageReference Include="SZ.Core.Models" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SZ.Core.Models\SZ.Core.Models.csproj" />
   </ItemGroup>
 
 </Project>
