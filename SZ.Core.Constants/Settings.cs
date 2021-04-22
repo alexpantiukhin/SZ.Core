@@ -21,7 +21,10 @@ namespace SZ.Core.Constants
             }
 
             public static readonly string AdminUserName = "Admin";
-            public static readonly string AdminPasswordHash = "AQAAAAEAACcQAAAAEEUFx0jIuCPgIwq13eLmj/7r07Q2A2dMO02o+XPlxcRU4xFeHxOZx3Dq4L3Icf+KVw==";// 1234Qwerty
+            /// <summary>
+            /// 1234Qwerty
+            /// </summary>
+            public static readonly string AdminPasswordHash = "AQAAAAEAACcQAAAAEEUFx0jIuCPgIwq13eLmj/7r07Q2A2dMO02o+XPlxcRU4xFeHxOZx3Dq4L3Icf+KVw==";
             public static readonly string AdminConcurrencyStamp = "2177d55a-454a-4bec-8631-8f9e79767a64";
             public static readonly string AdminSecurityStamp = "7FI7SGIK5V7WVU7FPQXRCTS5DH3YXH2C";
         }

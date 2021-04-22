@@ -30,7 +30,8 @@ namespace SZ.Test.Core
         public async Task CurrentUserAdminReturnNewPass()
         {
             //Arrange
-            var user1 = await DBFactory.CreateDbContext().AddUser(1);
+            var db = DBFactory.CreateDbContext();
+            var user1 = await db.AddUser(1);
             string testPassHash = user1.PasswordHash;
 
             var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
@@ -38,10 +39,10 @@ namespace SZ.Test.Core
             var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(user1.Id);
+            var result = await userManager.ChangePasswordAsync(user1.Id, db);
 
             //Assert
-            Assert.False(testPassHash == DBFactory.CreateDbContext().Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
+            Assert.False(testPassHash == db.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
                 "Админ должен иметь право смены пароля");
         }
 
@@ -53,16 +54,17 @@ namespace SZ.Test.Core
         public async Task CurrentUserSelfReturnNewPass()
         {
             //Arrange
-            var user1 = await DBFactory.CreateDbContext().AddUser(1);
+            var db = DBFactory.CreateDbContext();
+            var user1 = await db.AddUser(1);
             string testPassHash = user1.PasswordHash;
             var environment = new TestScopeEnvironment(user1.UserName, true);
             var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(user1.Id);
+            var result = await userManager.ChangePasswordAsync(user1.Id, db);
 
             //Assert
-            Assert.NotEqual(testPassHash, DBFactory.CreateDbContext().Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash);
+            Assert.NotEqual(testPassHash, db.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash);
         }
 
         /// <summary>
@@ -73,18 +75,19 @@ namespace SZ.Test.Core
         public async Task CurrentUserNotAuthReturnErrorModel()
         {
             //Arrange
-            var user1 = await DBFactory.CreateDbContext().AddUser(1);
+            var db = DBFactory.CreateDbContext();
+            var user1 = await db.AddUser(1);
             string testPassHash = user1.PasswordHash;
             var environment = new TestScopeEnvironment(user1.UserName, false);
 
             var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(user1.Id);
+            var result = await userManager.ChangePasswordAsync(user1.Id, db);
 
             //Assert
             Assert.True(!string.IsNullOrWhiteSpace(result.UserMessage), "Неавторизованный пользователь при попытке смены пароля должен получать ошибку");
-            Assert.True(testPassHash == DBFactory.CreateDbContext().Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
+            Assert.True(testPassHash == db.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
                 "При попытке смены пароля неавторизованным пользователем должен остаться старый пароль");
         }
 

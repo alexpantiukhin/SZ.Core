@@ -21,11 +21,12 @@ namespace SZ.Test.Core
         {
             //Arrange
             var environment = new TestScopeEnvironment();
-            var db = new TestDBFactory();
-            var userManager = new UserManager(singltoneEnv, environment, null, db);
+            var factory = new TestDBFactory();
+            var db = factory.CreateDbContext();
+            var userManager = new UserManager(singltoneEnv, environment, null, factory);
 
             //Act
-            var result = await userManager.IsAdminAsync(TestUsers.User1.Id);
+            var result = await userManager.IsAdminAsync(TestUsers.User1.Id, db);
 
             //Assert
             Assert.False(result);
@@ -40,12 +41,13 @@ namespace SZ.Test.Core
         {
             //Arrange
             var environment = new TestScopeEnvironment();
-            var db = new TestDBFactory();
-            var userManager = new UserManager(singltoneEnv, environment, null, db);
-            await db.CreateDbContext().AddUser(1);
+            var factory = new TestDBFactory();
+            var db = factory.CreateDbContext();
+            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            await db.AddUser(1);
 
             //Act
-            var result = await userManager.IsAdminAsync(TestUsers.User1.Id);
+            var result = await userManager.IsAdminAsync(TestUsers.User1.Id, db);
 
             //Assert
             Assert.False(result);
@@ -60,11 +62,12 @@ namespace SZ.Test.Core
         {
             //Arrange
             var environment = new TestScopeEnvironment();
-            var db = new TestDBFactory();
-            var userManager = new UserManager(singltoneEnv, environment, null, db);
+            var factory = new TestDBFactory();
+            var db = factory.CreateDbContext();
+            var userManager = new UserManager(singltoneEnv, environment, null, factory);
 
             //Act
-            var result = await userManager.IsAdminAsync(Settings.Users.AdminId);
+            var result = await userManager.IsAdminAsync(Settings.Users.AdminId, db);
 
             //Assert
             Assert.True(result);
