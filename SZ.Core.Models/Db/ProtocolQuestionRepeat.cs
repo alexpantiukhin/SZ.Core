@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using SZ.Core.Models.Interfaces;
+
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Вопросы для обсуждения в протоколе
     /// </summary>
-    public class ProtocolQuestionRepeat
+    public class ProtocolQuestionRepeat : IDBEntity
     {
         //public ProtocolQuestion()
         //{
@@ -50,5 +52,6 @@ namespace SZ.Core.Models.Db
         /// Решения принятые, относительно вопроса в протоколе
         /// </summary>
         public ICollection<DocumentDecision> DocumentDecisions { get; set; }
+        public int ShowId { get; set; }
     }
 }

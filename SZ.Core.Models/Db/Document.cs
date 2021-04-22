@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using SZ.Core.Constants;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
@@ -10,7 +11,7 @@ namespace SZ.Core.Models.Db
     /// Документ Земств. Может выпускаться десяткой (протоколы собраний), членами земства (заявления), должностными
     /// лицами Земства (решения)
     /// </summary>
-    public class Document
+    public class Document : IDBEntity
     {
         //public Document()
         //{
@@ -161,7 +162,7 @@ namespace SZ.Core.Models.Db
         /// Должности, снятые документом
         /// </summary>
         public ICollection<ZemstvoUserPosition> RecallUserPositions { get; set; }
-
+        public int ShowId { get; set; }
 
         public override string ToString()
         {

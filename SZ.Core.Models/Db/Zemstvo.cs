@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using SZ.Core.Models.Interfaces;
+
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Земство. Может быть частью другого земства
     /// </summary>
-    public class Zemstvo
+    public class Zemstvo : IDBEntity
     {
         //public Zemstvo()
         //{
@@ -90,5 +92,6 @@ namespace SZ.Core.Models.Db
         /// Документы, выпущенные в рамках земства
         /// </summary>
         public ICollection<Document> Documents { get; set; }
+        public int ShowId { get; set; }
     }
 }

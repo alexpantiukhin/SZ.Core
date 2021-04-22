@@ -1,11 +1,13 @@
 ﻿using System;
 
+using SZ.Core.Models.Interfaces;
+
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Член десятки
     /// </summary>
-    public class UserTen
+    public class UserTen : IDBEntity
     {
         public Guid Id { get; set; }
         /// <summary>
@@ -42,7 +44,7 @@ namespace SZ.Core.Models.Db
         /// Решение документа о выходе из десятки
         /// </summary>
         public Document BasisExitDocument { get; set; }
-
+        public int ShowId { get; set; }
 
         public override string ToString()
         {

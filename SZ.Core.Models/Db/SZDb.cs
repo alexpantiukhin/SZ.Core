@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using System;
+using System.Threading.Tasks;
 
 using SZ.Core.Models.Configurations;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
@@ -60,8 +63,47 @@ namespace SZ.Core.Models.Db
         /// </summary>
         public DbSet<QuestionRepeat> QuestionRepeats { get; set; }
 
+        readonly ILogger _logger;
 
-        public SZDb(DbContextOptions<SZDb> options) : base(options) { }
+        public SZDb(DbContextOptions<SZDb> options, ILoggerFactory loggerFactory) : base(options)
+        {
+            _logger = loggerFactory?.CreateLogger<SZDb>();
+        }
+
+        public async Task<bool> AddEntity<T>(T entity) where T : class, IDBEntity
+        {
+            try
+            {
+                var dbset = Set<T>();
+
+                await dbset.AddAsync(entity);
+
+                // даётся 10 попыток записать сущность
+                var saveCounter = 5;
+                do
+                {
+                    var maxId = await dbset.MaxAsync(x => x.ShowId);
+
+                    try
+                    {
+                        entity.ShowId = maxId;
+                        await SaveChangesAsync();
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogWarning($"Неудачная попытка записать сущность {typeof(T).Name} c showId {maxId}");
+                    }
+                    saveCounter--;
+                } while (saveCounter > 0);
+            }
+            catch (Exception e)
+            {
+                _logger?.LogError(e, $"Error added entity {typeof(T).Name}");
+            }
+
+            return false;
+        }
 
         public struct LengthRequirements
         {

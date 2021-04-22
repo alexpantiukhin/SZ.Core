@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 
 using SZ.Core.Constants;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Вопрос для обсуждения в десятке
     /// </summary>
-    public class Question
+    public class Question : IDBEntity
     {
         //public Question()
         //{
@@ -130,5 +131,6 @@ namespace SZ.Core.Models.Db
         /// Повторы обсуждения вопроса
         /// </summary>
         public ICollection<QuestionRepeat> QuestionRepeats { get; set; }
+        public int ShowId { get; set; }
     }
 }

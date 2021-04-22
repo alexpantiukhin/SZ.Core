@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using SZ.Core.Models.Interfaces;
+
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Пользователь документа. Если заявление или решение, то пользователь 1.
     /// Если протокол десятки, то пользователей множество
     /// </summary>
-    public class DocumentUser
+    public class DocumentUser : IDBEntity
     {
         //public DocumentUser()
         //{
@@ -42,5 +44,6 @@ namespace SZ.Core.Models.Db
         /// Решения, принятые пользователем в рамках документов
         /// </summary>
         public ICollection<DocumentDecision> DocumentDecisions { get; set; }
+        public int ShowId { get; set; }
     }
 }

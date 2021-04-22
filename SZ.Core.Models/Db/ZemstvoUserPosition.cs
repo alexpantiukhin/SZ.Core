@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 
 using SZ.Core.Constants;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Документы решений по должностям Земства
     /// </summary>
-    public class ZemstvoUserPosition
+    public class ZemstvoUserPosition : IDBEntity
     {
         public Guid Id { get; set; }
         /// <summary>
@@ -84,5 +85,6 @@ namespace SZ.Core.Models.Db
         /// Документы, выпущенные должностным лицом, назначенным на должность согласно данной записи
         /// </summary>
         public ICollection<Document> CreatorDocuments { get; set; }
+        public int ShowId { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using SZ.Core.Constants;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
@@ -9,7 +10,7 @@ namespace SZ.Core.Models.Db
     /// Повтор обсуждения вопроса.
     /// В рамках повтора вопрос не может изменяться.
     /// </summary>
-    public class QuestionRepeat
+    public class QuestionRepeat : IDBEntity
     {
         public Guid Id { get; set; }
         /// <summary>
@@ -99,5 +100,6 @@ namespace SZ.Core.Models.Db
         /// Вопросов поддержки данного повтора вопроса, которые создавались для делегатов каждого круга
         /// </summary>
         public ICollection<Question> SupportQuestions { get; set; }
+        public int ShowId { get; set; }
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using SZ.Core.Models.Interfaces;
+
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Десятка
     /// </summary>
-    public class Ten
+    public class Ten : IDBEntity
     {
         //public Ten()
         //{
@@ -35,6 +37,7 @@ namespace SZ.Core.Models.Db
         /// Id Земства
         /// </summary>
         public Guid ZemstvoId { get; set; }
+        public int ShowId { get; set; }
 
 
 

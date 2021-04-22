@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using SZ.Core.Constants;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {

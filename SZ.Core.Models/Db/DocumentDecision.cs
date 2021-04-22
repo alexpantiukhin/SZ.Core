@@ -1,13 +1,14 @@
 ﻿using System;
 
 using SZ.Core.Constants;
+using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
     /// <summary>
     /// Решение документа
     /// </summary>
-    public class DocumentDecision
+    public class DocumentDecision : IDBEntity
     {
         public Guid Id { get; set; }
         /// <summary>
@@ -86,6 +87,7 @@ namespace SZ.Core.Models.Db
         /// в электронном протоколе
         /// </summary>
         public User RealDecideUser { get; set; }
+        public int ShowId { get; set; }
 
 
 
