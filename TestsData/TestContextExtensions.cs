@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Threading.Tasks;
 
 using SZ.Core.Constants;
 using SZ.Core.Models.Db;
@@ -8,7 +9,7 @@ namespace TestData
 {
     public static class TestContextExtensions
     {
-        public static User AddUser(this SZDb db, int counter)
+        public static async Task<User> AddUser(this SZDb db, int counter)
         {
             Guid id;
             string UserName;
@@ -47,9 +48,9 @@ namespace TestData
                 Email = Email
             };
 
-            db.Users.Add(user);
+            await db.AddEntityAsync(user);
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return user;
         }

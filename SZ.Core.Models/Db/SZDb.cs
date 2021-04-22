@@ -70,7 +70,7 @@ namespace SZ.Core.Models.Db
             _logger = loggerFactory?.CreateLogger<SZDb>();
         }
 
-        public async Task<bool> AddEntity<T>(T entity) where T : class, IDBEntity
+        public async Task<bool> AddEntityAsync<T>(T entity) where T : class, IDBEntity
         {
             try
             {

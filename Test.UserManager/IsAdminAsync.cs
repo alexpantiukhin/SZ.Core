@@ -42,7 +42,7 @@ namespace SZ.Test.Core
             var environment = new TestScopeEnvironment();
             var db = new TestDBFactory();
             var userManager = new UserManager(singltoneEnv, environment, null, db);
-            db.DB.AddUser(1);
+            await db.CreateDbContext().AddUser(1);
 
             //Act
             var result = await userManager.IsAdminAsync(TestUsers.User1.Id);

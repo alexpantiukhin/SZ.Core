@@ -40,7 +40,7 @@ namespace SZ.Test.Core
         {
             //Arrange
             var db = new TestDBFactory();
-            var user = db.DB.AddUser(1);
+            var user = await db.CreateDbContext().AddUser(1);
             var environment = new TestScopeEnvironment(user);
             var userManager = new UserManager(singltoneEnv, environment, null, db);
 
@@ -79,7 +79,7 @@ namespace SZ.Test.Core
         {
             //Arrange
             var db = new TestDBFactory();
-            var user1 = db.DB.AddUser(1);
+            var user1 = await db.CreateDbContext().AddUser(1);
             var environment = new TestScopeEnvironment(user1, true);
             var userManager = new UserManager(singltoneEnv, environment, null, db);
 

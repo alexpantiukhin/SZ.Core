@@ -17,7 +17,7 @@ namespace SZ.Core
     {
         readonly ISZSingletonEnvironment _environment;
         readonly ILogger _logger;
-        readonly IDBFactory _dBFactory;
+        readonly IDbContextFactory<SZDb> _dBFactory;
         readonly ISZScopeEnvironment _userSessionEnvironment;
 
         User CurrentUser = null;
@@ -25,7 +25,7 @@ namespace SZ.Core
         public UserManager(ISZSingletonEnvironment environment,
             ISZScopeEnvironment userSessionEnvironment,
             ILoggerFactory loggerFactory,
-            IDBFactory dBFactory)
+            IDbContextFactory<SZDb> dBFactory)
         {
             _environment = environment;
             _logger = loggerFactory?.CreateLogger<UserManager>();
@@ -39,7 +39,7 @@ namespace SZ.Core
             if (CurrentUser != null)
                 return CurrentUser;
 
-            db = db ?? _dBFactory.DB;
+            db = db ?? _dBFactory.CreateDbContext();
 
             var identity = await _userSessionEnvironment.GetCurrentUserIdentityAsync();
 
@@ -55,7 +55,7 @@ namespace SZ.Core
 
         public async Task<bool> IsAdminAsync(Guid userId, SZDb db = null)
         {
-            db = db ?? _dBFactory.DB;
+            db = db ?? _dBFactory.CreateDbContext();
             return await db.UserRoles
                 .AnyAsync(x => x.UserId == userId
                 && x.RoleId == Settings.Roles.AdminId);
@@ -63,7 +63,7 @@ namespace SZ.Core
 
         public async Task<Result<string>> ChangePasswordAsync(Guid userId, SZDb db = null)
         {
-            db = db ?? _dBFactory.DB;
+            db = db ?? _dBFactory.CreateDbContext();
             var result = new Result<string>(_logger);
 
             var currentUser = await GetCurrentUserAsync(db);
