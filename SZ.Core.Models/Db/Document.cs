@@ -103,6 +103,10 @@ namespace SZ.Core.Models.Db
         /// и при приёме секретариатом
         /// </summary>
         public bool RequirePaper { get; set; }
+        public int ShowId { get; set; }
+
+
+
 
 
         /// <summary>
@@ -162,7 +166,6 @@ namespace SZ.Core.Models.Db
         /// Должности, снятые документом
         /// </summary>
         public ICollection<ZemstvoUserPosition> RecallUserPositions { get; set; }
-        public int ShowId { get; set; }
 
         public override string ToString()
         {

@@ -59,6 +59,7 @@ namespace SZ.Core.Models.Db
         /// в электронном протоколе
         /// </summary>
         public Guid RealDecideUserId { get; set; }
+        public int ShowId { get; set; }
 
 
 
@@ -87,7 +88,6 @@ namespace SZ.Core.Models.Db
         /// в электронном протоколе
         /// </summary>
         public User RealDecideUser { get; set; }
-        public int ShowId { get; set; }
 
 
 

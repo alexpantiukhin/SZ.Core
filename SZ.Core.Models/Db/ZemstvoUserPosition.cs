@@ -40,6 +40,9 @@ namespace SZ.Core.Models.Db
         /// Id Земства, в котором учреждена должность
         /// </summary>
         public Guid ZemstvoId { get; set; }
+        public int ShowId { get; set; }
+
+
 
 
         /// <summary>
@@ -85,6 +88,5 @@ namespace SZ.Core.Models.Db
         /// Документы, выпущенные должностным лицом, назначенным на должность согласно данной записи
         /// </summary>
         public ICollection<Document> CreatorDocuments { get; set; }
-        public int ShowId { get; set; }
     }
 }

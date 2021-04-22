@@ -67,7 +67,8 @@ namespace SZ.Core.Models.Db
         /// набравшие простое большинство
         /// </summary>
         public bool RequireVariantsQuorum { get; set; }
- 
+        public int ShowId { get; set; }
+
 
         /// <summary>
         /// Вопрос
@@ -100,6 +101,5 @@ namespace SZ.Core.Models.Db
         /// Вопросов поддержки данного повтора вопроса, которые создавались для делегатов каждого круга
         /// </summary>
         public ICollection<Question> SupportQuestions { get; set; }
-        public int ShowId { get; set; }
     }
 }

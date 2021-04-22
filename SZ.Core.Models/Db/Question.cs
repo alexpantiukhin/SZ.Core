@@ -102,6 +102,7 @@ namespace SZ.Core.Models.Db
         /// Id повтора вопроса, поддерживаемого делегатом
         /// </summary>
         public Guid? SupportQuestionRepeatId { get; set; }
+        public int ShowId { get; set; }
 
 
         /// <summary>
@@ -131,6 +132,5 @@ namespace SZ.Core.Models.Db
         /// Повторы обсуждения вопроса
         /// </summary>
         public ICollection<QuestionRepeat> QuestionRepeats { get; set; }
-        public int ShowId { get; set; }
     }
 }

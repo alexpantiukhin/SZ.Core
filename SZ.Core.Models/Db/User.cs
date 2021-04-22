@@ -155,6 +155,9 @@ namespace SZ.Core.Models.Db
         /// Дата создания пользователя
         /// </summary>
         public DateTimeOffset DTCUTC { get; set; }
+        public int ShowId { get; set; }
+
+
 
 
 
@@ -219,7 +222,6 @@ namespace SZ.Core.Models.Db
         /// Решения в протоколе, которые реально отметил пользователь
         /// </summary>
         public ICollection<DocumentDecision> RealDecisions { get; set; }
-        public int ShowId { get; set; }
 
         public override string ToString()
         {

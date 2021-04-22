@@ -10,6 +10,7 @@ namespace SZ.Test.Core
 {
     public class GetCurrentUserAsync
     {
+        TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         /// <summary>
         /// Объект Identity не определён. Возвращает null
         /// </summary>
@@ -18,9 +19,10 @@ namespace SZ.Test.Core
         public async Task IdentityNullReturnNull()
         {
             //Arrange
-            var environment = new TestEnvironment();
+            
+            var scopeEnvironment = new TestScopeEnvironment();
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null, db);
+            var userManager = new UserManager(singltoneEnv, scopeEnvironment, null, db);
 
             //Act
             var result = await userManager.GetCurrentUserAsync();
@@ -39,8 +41,8 @@ namespace SZ.Test.Core
             //Arrange
             var db = new TestDBFactory();
             var user = db.DB.AddUser(1);
-            var environment = new TestEnvironment(user);
-            var userManager = new UserManager(environment, null, db);
+            var environment = new TestScopeEnvironment(user);
+            var userManager = new UserManager(singltoneEnv, environment, null, db);
 
             //Act
             var result = await userManager.GetCurrentUserAsync();
@@ -57,9 +59,9 @@ namespace SZ.Test.Core
         public async Task IdentityNotFoundReturnNull()
         {
             //Arrange
-            var environment = new TestEnvironment("User1", true);
+            var environment = new TestScopeEnvironment("User1", true);
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null, db);
+            var userManager = new UserManager(singltoneEnv, environment, null, db);
 
             //Act
             var result = await userManager.GetCurrentUserAsync();
@@ -78,8 +80,8 @@ namespace SZ.Test.Core
             //Arrange
             var db = new TestDBFactory();
             var user1 = db.DB.AddUser(1);
-            var environment = new TestEnvironment(user1, true);
-            var userManager = new UserManager(environment, null, db);
+            var environment = new TestScopeEnvironment(user1, true);
+            var userManager = new UserManager(singltoneEnv, environment, null, db);
 
             //Act
             var result = await userManager.GetCurrentUserAsync();

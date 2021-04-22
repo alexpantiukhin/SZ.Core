@@ -68,6 +68,9 @@ namespace SZ.Core.Models.Db
         /// если их тип разный. Тип не изменяется
         /// </summary>
         public string Type { get; set; }
+        public int ShowId { get; set; }
+
+
 
 
         /// <summary>
@@ -92,6 +95,5 @@ namespace SZ.Core.Models.Db
         /// Документы, выпущенные в рамках земства
         /// </summary>
         public ICollection<Document> Documents { get; set; }
-        public int ShowId { get; set; }
     }
 }

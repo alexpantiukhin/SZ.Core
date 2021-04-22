@@ -6,7 +6,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.5" />
-    <PackageReference Include="SZ.Core.Abstractions" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SZ.Core.Abstractions\SZ.Core.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

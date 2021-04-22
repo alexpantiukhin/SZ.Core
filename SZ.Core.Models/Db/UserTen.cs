@@ -26,6 +26,9 @@ namespace SZ.Core.Models.Db
         /// id решения документа о выходе из десятки
         /// </summary>
         public Guid? BasisExitDocumentId { get; set; }
+        public int ShowId { get; set; }
+
+
 
 
         /// <summary>
@@ -44,11 +47,10 @@ namespace SZ.Core.Models.Db
         /// Решение документа о выходе из десятки
         /// </summary>
         public Document BasisExitDocument { get; set; }
-        public int ShowId { get; set; }
 
         public override string ToString()
         {
-            return "Десятка - " + TenId + ", Пользователь - " + User.ToString(); 
+            return "Десятка - " + TenId + ", Пользователь - " + User.ToString();
         }
     }
 }

@@ -65,7 +65,7 @@ namespace SZ.Core.Models.Db
 
         readonly ILogger _logger;
 
-        public SZDb(DbContextOptions<SZDb> options, ILoggerFactory loggerFactory) : base(options)
+        public SZDb(DbContextOptions<SZDb> options, ILoggerFactory loggerFactory = null) : base(options)
         {
             _logger = loggerFactory?.CreateLogger<SZDb>();
         }

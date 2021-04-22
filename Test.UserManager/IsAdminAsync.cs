@@ -11,6 +11,7 @@ namespace SZ.Test.Core
 {
     public class IsAdminAsync
     {
+        TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         /// <summary>
         /// Пользователь не определён. Возвращает false
         /// </summary>
@@ -19,9 +20,9 @@ namespace SZ.Test.Core
         public async Task UserNotFoundReturnFalse()
         {
             //Arrange
-            var environment = new TestEnvironment();
+            var environment = new TestScopeEnvironment();
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null, db);
+            var userManager = new UserManager(singltoneEnv, environment, null, db);
 
             //Act
             var result = await userManager.IsAdminAsync(TestUsers.User1.Id);
@@ -38,9 +39,9 @@ namespace SZ.Test.Core
         public async Task UserNotAdminReturnFalse()
         {
             //Arrange
-            var environment = new TestEnvironment();
+            var environment = new TestScopeEnvironment();
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null, db);
+            var userManager = new UserManager(singltoneEnv, environment, null, db);
             db.DB.AddUser(1);
 
             //Act
@@ -58,9 +59,9 @@ namespace SZ.Test.Core
         public async Task UserIsAdminReturnTrue()
         {
             //Arrange
-            var environment = new TestEnvironment();
+            var environment = new TestScopeEnvironment();
             var db = new TestDBFactory();
-            var userManager = new UserManager(environment, null, db);
+            var userManager = new UserManager(singltoneEnv, environment, null, db);
 
             //Act
             var result = await userManager.IsAdminAsync(Settings.Users.AdminId);

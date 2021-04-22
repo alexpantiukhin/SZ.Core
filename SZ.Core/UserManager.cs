@@ -15,19 +15,22 @@ namespace SZ.Core
 {
     public class UserManager : IUserManager
     {
-        readonly ISZEnvironment _environment;
+        readonly ISZSingletonEnvironment _environment;
         readonly ILogger _logger;
         readonly IDBFactory _dBFactory;
+        readonly ISZScopeEnvironment _userSessionEnvironment;
 
         User CurrentUser = null;
 
-        public UserManager(ISZEnvironment environment,
+        public UserManager(ISZSingletonEnvironment environment,
+            ISZScopeEnvironment userSessionEnvironment,
             ILoggerFactory loggerFactory,
             IDBFactory dBFactory)
         {
             _environment = environment;
             _logger = loggerFactory?.CreateLogger<UserManager>();
             _dBFactory = dBFactory;
+            _userSessionEnvironment = userSessionEnvironment;
         }
 
 
@@ -38,7 +41,7 @@ namespace SZ.Core
 
             db = db ?? _dBFactory.DB;
 
-            var identity = await _environment.GetCurrentUserIdentityAsync();
+            var identity = await _userSessionEnvironment.GetCurrentUserIdentityAsync();
 
             if (identity?.IsAuthenticated != true)
                 return null;

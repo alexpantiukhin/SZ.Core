@@ -25,6 +25,10 @@ namespace SZ.Core.Models.Db
         public string Answer { get; set; }
 
         public Guid? CandidatId { get; set; }
+        public int ShowId { get; set; }
+
+
+
 
         /// <summary>
         /// Выбираемый кандидат
@@ -40,7 +44,6 @@ namespace SZ.Core.Models.Db
         /// Решения, в которых выбран данный ответ
         /// </summary>
         public ICollection<DocumentDecision> DocumentDecisions { get; set; }
-        public int ShowId { get; set; }
 
         public override string ToString()
         {

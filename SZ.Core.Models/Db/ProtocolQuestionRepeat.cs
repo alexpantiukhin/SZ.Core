@@ -31,6 +31,7 @@ namespace SZ.Core.Models.Db
         /// Id повтора вопроса, предложенный решением этого протокола
         /// </summary>
         public Guid? SupportQuestionNewRepeatId { get; set; }
+        public int ShowId { get; set; }
 
 
 
@@ -52,6 +53,5 @@ namespace SZ.Core.Models.Db
         /// Решения принятые, относительно вопроса в протоколе
         /// </summary>
         public ICollection<DocumentDecision> DocumentDecisions { get; set; }
-        public int ShowId { get; set; }
     }
 }

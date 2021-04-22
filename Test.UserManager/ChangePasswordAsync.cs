@@ -16,6 +16,7 @@ namespace SZ.Test.Core
     /// </summary>
     public class ChangePasswordAsync
     {
+        TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         TestDBFactory DBFactory;
         public ChangePasswordAsync()
         {
@@ -32,9 +33,9 @@ namespace SZ.Test.Core
             var user1 = DBFactory.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
 
-            var environment = new TestEnvironment(Settings.Users.AdminUserName, true);
+            var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
 
-            var userManager = new UserManager(environment, null, DBFactory);
+            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
             var result = await userManager.ChangePasswordAsync(user1.Id);
@@ -54,8 +55,8 @@ namespace SZ.Test.Core
             //Arrange
             var user1 = DBFactory.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            var environment = new TestEnvironment(user1.UserName, true);
-            var userManager = new UserManager(environment, null, DBFactory);
+            var environment = new TestScopeEnvironment(user1.UserName, true);
+            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
             var result = await userManager.ChangePasswordAsync(user1.Id);
@@ -74,9 +75,9 @@ namespace SZ.Test.Core
             //Arrange
             var user1 = DBFactory.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            var environment = new TestEnvironment(user1.UserName, false);
+            var environment = new TestScopeEnvironment(user1.UserName, false);
 
-            var userManager = new UserManager(environment, null, DBFactory);
+            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
             var result = await userManager.ChangePasswordAsync(user1.Id);
@@ -96,8 +97,8 @@ namespace SZ.Test.Core
         public async Task CurrentUserAdmin_ChangeUserNo_ReturnErrorModel()
         {
             //Arrange
-            var environment = new TestEnvironment(Settings.Users.AdminUserName, true);
-            var userManager = new UserManager(environment, null, DBFactory);
+            var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
 
             //Act
             var result = await userManager.ChangePasswordAsync(Guid.NewGuid());

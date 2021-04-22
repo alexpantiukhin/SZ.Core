@@ -29,6 +29,7 @@ namespace SZ.Core.Models.Db
         /// Указывается для протоколов собраний десяток
         /// </summary>
         public bool AttendsTheMeeting { get; set; }
+        public int ShowId { get; set; }
 
 
         /// <summary>
@@ -44,6 +45,5 @@ namespace SZ.Core.Models.Db
         /// Решения, принятые пользователем в рамках документов
         /// </summary>
         public ICollection<DocumentDecision> DocumentDecisions { get; set; }
-        public int ShowId { get; set; }
     }
 }
