@@ -43,7 +43,9 @@ namespace SZ.Core.Models.Db
                 PasswordHash = Settings.Users.AdminPasswordHash,
                 SecurityStamp = Settings.Users.AdminSecurityStamp,
                 ConcurrencyStamp = Settings.Users.AdminConcurrencyStamp,
-                Gender = true
+                Gender = true,
+                UserName = Settings.Users.AdminUserName,
+                NormalizedUserName = Settings.Users.AdminUserName.ToUpper()
             };
             builder.Entity<User>().HasData(admin);
 

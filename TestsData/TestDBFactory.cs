@@ -10,6 +10,18 @@ namespace TestData
 {
     public class TestDBFactory : IDbContextFactory<SZDb>
     {
+        readonly string permanentIdDB;
+
+        public TestDBFactory()
+        {
+
+        }
+
+        public TestDBFactory(bool permanent)
+        {
+            if (permanent)
+                permanentIdDB = Guid.NewGuid().ToString();
+        }
 
         public SZDb CreateDbContext()
         {
@@ -18,41 +30,51 @@ namespace TestData
             try
             {
                 var builder = new DbContextOptionsBuilder<SZDb>();
-                builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
+                builder.UseInMemoryDatabase(permanentIdDB ?? Guid.NewGuid().ToString());
                 builder.EnableSensitiveDataLogging();
                 DbContextOptions<SZDb> _options = builder.Options;
 
                 _SZDb = new SZDb(_options);
+                _SZDb.Database.EnsureCreated();
 
-                _SZDb.Roles.Add(new IdentityRole<Guid>
+                //_SZDb.Roles.Add(new IdentityRole<Guid>
+                //{
+                //    Id = Settings.Roles.AdminId,
+                //    ConcurrencyStamp = Settings.Roles.AdminConcurrencyStamp,
+                //    Name = Settings.Users.AdminUserName,
+                //    NormalizedName = Settings.Users.AdminUserName
+                //});
+
+                //_SZDb.Users.Add(new User
+                //{
+                //    Id = Settings.Users.AdminId,
+                //    UserName = Settings.Users.AdminUserName,
+                //    ConcurrencyStamp = Settings.Users.AdminConcurrencyStamp,
+                //    SecurityStamp = Settings.Users.AdminSecurityStamp,
+                //    DTCUTC = DateTime.Parse("01.01.2020"),
+                //    FirstName = Settings.Users.AdminUserName,
+                //    SecondName = Settings.Users.AdminUserName,
+                //    Patronym = Settings.Users.AdminUserName,
+                //    PasswordHash = Settings.Users.AdminPasswordHash,
+                //    NormalizedUserName = Settings.Users.AdminUserName.ToUpper()
+                //});
+
+                //_SZDb.UserRoles.Add(new IdentityUserRole<Guid>
+                //{
+                //    UserId = Settings.Users.AdminId,
+                //    RoleId = Settings.Roles.AdminId
+                //});
+
+                try
                 {
-                    Id = Settings.Roles.AdminId,
-                    ConcurrencyStamp = Settings.Roles.AdminConcurrencyStamp,
-                    Name = Settings.Users.AdminUserName,
-                    NormalizedName = Settings.Users.AdminUserName
-                });
+                    _SZDb.SaveChanges();
 
-                _SZDb.Users.Add(new User
+                }
+                catch
                 {
-                    Id = Settings.Users.AdminId,
-                    UserName = Settings.Users.AdminUserName,
-                    ConcurrencyStamp = Settings.Users.AdminConcurrencyStamp,
-                    SecurityStamp = Settings.Users.AdminSecurityStamp,
-                    DTCUTC = DateTime.Now,
-                    FirstName = Settings.Users.AdminUserName,
-                    SecondName = Settings.Users.AdminUserName,
-                    Patronym = Settings.Users.AdminUserName,
-                    PasswordHash = Settings.Users.AdminPasswordHash
-                });
 
-                _SZDb.UserRoles.Add(new IdentityUserRole<Guid>
-                {
-                    UserId = Settings.Users.AdminId,
-                    RoleId = Settings.Roles.AdminId
-                });
+                }
 
-
-                _SZDb.SaveChanges();
             }
             catch (Exception e)
             {

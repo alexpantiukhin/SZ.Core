@@ -64,10 +64,12 @@ namespace SZ.Core.Models.Db
         public DbSet<QuestionRepeat> QuestionRepeats { get; set; }
 
         readonly ILogger _logger;
+        readonly bool _withoutMigrations;
 
-        public SZDb(DbContextOptions<SZDb> options, ILoggerFactory loggerFactory = null) : base(options)
+        public SZDb(DbContextOptions<SZDb> options, ILoggerFactory loggerFactory = null, bool withoutMigrations = false) : base(options)
         {
             _logger = loggerFactory?.CreateLogger<SZDb>();
+            _withoutMigrations = withoutMigrations;
         }
 
         public async Task<bool> AddEntityAsync<T>(T entity) where T : class, IDBEntity
@@ -121,6 +123,7 @@ namespace SZ.Core.Models.Db
                 public const int Flat = 5;
             }
         }
+
         protected sealed override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfiguration(new DocumentConfiguration());
