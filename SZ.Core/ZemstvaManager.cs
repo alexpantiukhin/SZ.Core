@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,12 @@ namespace SZ.Core
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
 
-        public async Task<Result<Zemstvo>> CreateAsync(DBProvider provider, ISZScopeEnvironment scopeEnvironment, string name)
+        public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] ISZScopeEnvironment scopeEnvironment, [NotNull] string zemstvoName)
         {
             var result = new Result<Zemstvo>(_logger);
+
+            if (string.IsNullOrWhiteSpace(zemstvoName))
+                return result.AddError("Не передано имя земства");
 
             var currentUser = await _userManager.GetCurrentUserAsync(provider, scopeEnvironment);
 
@@ -40,7 +44,7 @@ namespace SZ.Core
             var newZemstvo = new Zemstvo
             {
                 Id = Guid.NewGuid(),
-                Name = name
+                Name = zemstvoName
             };
 
             var addedResult = await provider.DB.AddEntityAsync(newZemstvo);

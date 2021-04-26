@@ -47,5 +47,19 @@ namespace Test.ZemstvaManager
             Assert.True(!instance.Success, "При попытке создания земства не админом резульат должне быть с ошибкой");
             Assert.True(instance.Model == null, "При создании земства не админом возвращаемая модель должна быть null");
         }
+
+        [Fact]
+        public async Task CurrentUserIsAdminNullName_ReturnNull()
+        {
+            //arrange
+            var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            string zemstvoName = null;
+
+            //act
+            var instance = await _manager.CreateAsync(new DBProvider(factory), scopeEnvironment, zemstvoName);
+
+            //assert
+            Assert.True(!instance.Success, "При попытке создания земства, не указав имя должна быть ошибка");
+        }
     }
 }

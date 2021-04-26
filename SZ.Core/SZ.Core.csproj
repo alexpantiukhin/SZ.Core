@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>9.0</LangVersion>
     <Authors>Alexander Pantiukhin</Authors>
     <Company>Alexander Pantiukhin</Company>
     <Version>1.0.2</Version>
