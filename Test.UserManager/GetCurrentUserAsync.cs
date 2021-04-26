@@ -22,10 +22,10 @@ namespace SZ.Test.Core
             
             var scopeEnvironment = new TestScopeEnvironment();
             var db = new TestDBFactory();
-            var userManager = new UserManager(singltoneEnv, scopeEnvironment, null, db);
+            var userManager = new UserManager(singltoneEnv, null, db);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync();
+            var result = await userManager.GetCurrentUserAsync(scopeEnvironment);
 
             //Assert
             Assert.Null(result);
@@ -43,10 +43,10 @@ namespace SZ.Test.Core
             var db = factory.CreateDbContext();
             var user = await db.AddUser(1);
             var environment = new TestScopeEnvironment(user);
-            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            var userManager = new UserManager(singltoneEnv, null, factory);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(db);
+            var result = await userManager.GetCurrentUserAsync(environment, db);
 
             //Assert
             Assert.Null(result);
@@ -63,10 +63,10 @@ namespace SZ.Test.Core
             var environment = new TestScopeEnvironment("User1", true);
             var factory = new TestDBFactory();
             var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            var userManager = new UserManager(singltoneEnv, null, factory);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(db);
+            var result = await userManager.GetCurrentUserAsync(environment, db);
 
             //Assert
             Assert.Null(result);
@@ -84,10 +84,10 @@ namespace SZ.Test.Core
             var db = factory.CreateDbContext();
             var user1 = await db.AddUser(1);
             var environment = new TestScopeEnvironment(user1, true);
-            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            var userManager = new UserManager(singltoneEnv, null, factory);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(db);
+            var result = await userManager.GetCurrentUserAsync(environment, db);
 
             //Assert
             Assert.True(user1.Id == result.Id, "Если пользователь найден, то должен быть возвращён");

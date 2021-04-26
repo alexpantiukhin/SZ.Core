@@ -18,30 +18,27 @@ namespace SZ.Core
         readonly ISZSingletonEnvironment _environment;
         readonly ILogger _logger;
         readonly IDbContextFactory<SZDb> _dBFactory;
-        readonly ISZScopeEnvironment _userSessionEnvironment;
 
         User CurrentUser = null;
 
         public UserManager(ISZSingletonEnvironment environment,
-            ISZScopeEnvironment userSessionEnvironment,
             ILoggerFactory loggerFactory,
             IDbContextFactory<SZDb> dBFactory)
         {
             _environment = environment;
             _logger = loggerFactory?.CreateLogger<UserManager>();
             _dBFactory = dBFactory;
-            _userSessionEnvironment = userSessionEnvironment;
         }
 
 
-        public async Task<User> GetCurrentUserAsync(SZDb db = null)
+        public async Task<User> GetCurrentUserAsync(ISZScopeEnvironment userSessionEnvironment, SZDb db = null)
         {
             if (CurrentUser != null)
                 return CurrentUser;
 
             db = db ?? _dBFactory.CreateDbContext();
 
-            var identity = await _userSessionEnvironment.GetCurrentUserIdentityAsync();
+            var identity = await userSessionEnvironment.GetCurrentUserIdentityAsync();
 
             if (identity?.IsAuthenticated != true)
                 return null;
@@ -61,12 +58,12 @@ namespace SZ.Core
                 && x.RoleId == Settings.Roles.AdminId);
         }
 
-        public async Task<Result<string>> ChangePasswordAsync(Guid userId, SZDb db = null)
+        public async Task<Result<string>> GeneratePasswordAsync(ISZScopeEnvironment userSessionEnvironment, Guid userId, SZDb db = null)
         {
             db = db ?? _dBFactory.CreateDbContext();
             var result = new Result<string>(_logger);
 
-            var currentUser = await GetCurrentUserAsync(db);
+            var currentUser = await GetCurrentUserAsync(userSessionEnvironment, db);
 
             if (currentUser == null)
                 return result.AddError("Войдите в систему", $"Попытка смены пароля пользователю {userId} неавторизованным пользователем");
@@ -108,7 +105,7 @@ namespace SZ.Core
         }
 
 
-        private string GeneratePassword()
+        string GeneratePassword()
         {
             int length = Settings.PasswordOptions.RequiredLength;
             bool nonAlphanumeric = Settings.PasswordOptions.RequireNonAlphanumeric;

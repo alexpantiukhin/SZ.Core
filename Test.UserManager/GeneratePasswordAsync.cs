@@ -14,11 +14,11 @@ namespace SZ.Test.Core
     /// <summary>
     /// ћен€ть пароль могут только секретари, админ и сам пользователь
     /// </summary>
-    public class ChangePasswordAsync
+    public class GeneratePasswordAsync
     {
         TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         TestDBFactory DBFactory;
-        public ChangePasswordAsync()
+        public GeneratePasswordAsync()
         {
             DBFactory = new TestDBFactory();
         }
@@ -27,7 +27,7 @@ namespace SZ.Test.Core
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task CurrentUserAdminReturnNewPass()
+        public async Task CurrentUserAdmin_ReturnNewPass()
         {
             //Arrange
             var db = DBFactory.CreateDbContext();
@@ -36,10 +36,10 @@ namespace SZ.Test.Core
 
             var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
 
-            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
+            var userManager = new UserManager(singltoneEnv, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(user1.Id, db);
+            var result = await userManager.GeneratePasswordAsync(environment, user1.Id, db);
 
             //Assert
             Assert.False(testPassHash == db.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash,
@@ -58,10 +58,10 @@ namespace SZ.Test.Core
             var user1 = await db.AddUser(1);
             string testPassHash = user1.PasswordHash;
             var environment = new TestScopeEnvironment(user1.UserName, true);
-            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
+            var userManager = new UserManager(singltoneEnv, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(user1.Id, db);
+            var result = await userManager.GeneratePasswordAsync(environment, user1.Id, db);
 
             //Assert
             Assert.NotEqual(testPassHash, db.Users.FirstOrDefault(x => x.Id == user1.Id).PasswordHash);
@@ -80,10 +80,10 @@ namespace SZ.Test.Core
             string testPassHash = user1.PasswordHash;
             var environment = new TestScopeEnvironment(user1.UserName, false);
 
-            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
+            var userManager = new UserManager(singltoneEnv, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(user1.Id, db);
+            var result = await userManager.GeneratePasswordAsync(environment, user1.Id, db);
 
             //Assert
             Assert.True(!string.IsNullOrWhiteSpace(result.UserMessage), "Ќеавторизованный пользователь при попытке смены парол€ должен получать ошибку");
@@ -101,10 +101,10 @@ namespace SZ.Test.Core
         {
             //Arrange
             var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
-            var userManager = new UserManager(singltoneEnv, environment, null, DBFactory);
+            var userManager = new UserManager(singltoneEnv, null, DBFactory);
 
             //Act
-            var result = await userManager.ChangePasswordAsync(Guid.NewGuid());
+            var result = await userManager.GeneratePasswordAsync(environment, Guid.NewGuid());
 
             //Assert
             Assert.True(!string.IsNullOrWhiteSpace(result.UserMessage), "ѕопытка изменить пароль несуществующему пользователю должна возвращать модель с ошибкой");

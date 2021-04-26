@@ -20,10 +20,9 @@ namespace SZ.Test.Core
         public async Task UserNotFoundReturnFalse()
         {
             //Arrange
-            var environment = new TestScopeEnvironment();
             var factory = new TestDBFactory();
             var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            var userManager = new UserManager(singltoneEnv, null, factory);
 
             //Act
             var result = await userManager.IsAdminAsync(TestUsers.User1.Id, db);
@@ -40,10 +39,9 @@ namespace SZ.Test.Core
         public async Task UserNotAdminReturnFalse()
         {
             //Arrange
-            var environment = new TestScopeEnvironment();
             var factory = new TestDBFactory();
             var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            var userManager = new UserManager(singltoneEnv, null, factory);
             await db.AddUser(1);
 
             //Act
@@ -61,10 +59,9 @@ namespace SZ.Test.Core
         public async Task UserIsAdminReturnTrue()
         {
             //Arrange
-            var environment = new TestScopeEnvironment();
             var factory = new TestDBFactory();
             var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, environment, null, factory);
+            var userManager = new UserManager(singltoneEnv, null, factory);
 
             //Act
             var result = await userManager.IsAdminAsync(Settings.Users.AdminId, db);
