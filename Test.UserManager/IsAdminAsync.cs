@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 
 using SZ.Core;
 using SZ.Core.Constants;
+using SZ.Core.Models;
 
 using TestData;
 
@@ -11,6 +12,7 @@ namespace SZ.Test.Core
 {
     public class IsAdminAsync
     {
+        TestDBFactory factory = new TestDBFactory();
         TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         /// <summary>
         /// Пользователь не определён. Возвращает false
@@ -20,12 +22,12 @@ namespace SZ.Test.Core
         public async Task UserNotFoundReturnFalse()
         {
             //Arrange
-            var factory = new TestDBFactory();
+            var dbProvider = new DBProvider(factory);
             var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, null, factory);
+            var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.IsAdminAsync(TestUsers.User1.Id, db);
+            var result = await userManager.IsAdminAsync(dbProvider, TestUsers.User1.Id);
 
             //Assert
             Assert.False(result);
@@ -39,13 +41,13 @@ namespace SZ.Test.Core
         public async Task UserNotAdminReturnFalse()
         {
             //Arrange
-            var factory = new TestDBFactory();
-            var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, null, factory);
-            await db.AddUser(1);
+            var dbProvider = new DBProvider(factory);
+            var userManager = new UserManager(singltoneEnv, null);
+            await dbProvider.DB.AddUser(1);
+
 
             //Act
-            var result = await userManager.IsAdminAsync(TestUsers.User1.Id, db);
+            var result = await userManager.IsAdminAsync(dbProvider, TestUsers.User1.Id);
 
             //Assert
             Assert.False(result);
@@ -59,12 +61,11 @@ namespace SZ.Test.Core
         public async Task UserIsAdminReturnTrue()
         {
             //Arrange
-            var factory = new TestDBFactory();
-            var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, null, factory);
+            var dbProvider = new DBProvider(factory);
+            var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.IsAdminAsync(Settings.Users.AdminId, db);
+            var result = await userManager.IsAdminAsync(dbProvider, Settings.Users.AdminId);
 
             //Assert
             Assert.True(result);

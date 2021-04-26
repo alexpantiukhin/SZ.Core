@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 
 using SZ.Core;
+using SZ.Core.Models;
 
 using TestData;
 
@@ -10,6 +11,7 @@ namespace SZ.Test.Core
 {
     public class GetCurrentUserAsync
     {
+        TestDBFactory factory = new TestDBFactory();
         TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         /// <summary>
         /// Объект Identity не определён. Возвращает null
@@ -19,13 +21,12 @@ namespace SZ.Test.Core
         public async Task IdentityNullReturnNull()
         {
             //Arrange
-            
+            var dbProvider = new DBProvider(factory);
             var scopeEnvironment = new TestScopeEnvironment();
-            var db = new TestDBFactory();
-            var userManager = new UserManager(singltoneEnv, null, db);
+            var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(scopeEnvironment);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, scopeEnvironment);
 
             //Assert
             Assert.Null(result);
@@ -39,14 +40,13 @@ namespace SZ.Test.Core
         public async Task IdentityIsNotAuthReturnNull()
         {
             //Arrange
-            var factory = new TestDBFactory();
-            var db = factory.CreateDbContext();
-            var user = await db.AddUser(1);
+            var dbProvider = new DBProvider(factory);
+            var user = await dbProvider.DB.AddUser(1);
             var environment = new TestScopeEnvironment(user);
-            var userManager = new UserManager(singltoneEnv, null, factory);
+            var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(environment, db);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, environment);
 
             //Assert
             Assert.Null(result);
@@ -61,12 +61,11 @@ namespace SZ.Test.Core
         {
             //Arrange
             var environment = new TestScopeEnvironment("User1", true);
-            var factory = new TestDBFactory();
-            var db = factory.CreateDbContext();
-            var userManager = new UserManager(singltoneEnv, null, factory);
+            var dbProvider = new DBProvider(factory);
+            var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(environment, db);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, environment);
 
             //Assert
             Assert.Null(result);
@@ -80,14 +79,13 @@ namespace SZ.Test.Core
         public async Task IdentityHasUserReturnUser()
         {
             //Arrange
-            var factory = new TestDBFactory();
-            var db = factory.CreateDbContext();
-            var user1 = await db.AddUser(1);
+            var dbProvider = new DBProvider(factory);
+            var user1 = await dbProvider.DB.AddUser(1);
             var environment = new TestScopeEnvironment(user1, true);
-            var userManager = new UserManager(singltoneEnv, null, factory);
+            var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(environment, db);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, environment);
 
             //Assert
             Assert.True(user1.Id == result.Id, "Если пользователь найден, то должен быть возвращён");

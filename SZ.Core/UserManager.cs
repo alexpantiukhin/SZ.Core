@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using SZ.Core.Abstractions.Interfaces;
 using SZ.Core.Constants;
+using SZ.Core.Models;
 using SZ.Core.Models.Db;
 
 namespace SZ.Core
@@ -17,63 +18,56 @@ namespace SZ.Core
     {
         readonly ISZSingletonEnvironment _environment;
         readonly ILogger _logger;
-        readonly IDbContextFactory<SZDb> _dBFactory;
 
         User CurrentUser = null;
 
         public UserManager(ISZSingletonEnvironment environment,
-            ILoggerFactory loggerFactory,
-            IDbContextFactory<SZDb> dBFactory)
+            ILoggerFactory loggerFactory)
         {
             _environment = environment;
             _logger = loggerFactory?.CreateLogger<UserManager>();
-            _dBFactory = dBFactory;
         }
 
 
-        public async Task<User> GetCurrentUserAsync(ISZScopeEnvironment userSessionEnvironment, SZDb db = null)
+        public async Task<User> GetCurrentUserAsync(DBProvider provider, ISZScopeEnvironment userSessionEnvironment)
         {
             if (CurrentUser != null)
                 return CurrentUser;
-
-            db = db ?? _dBFactory.CreateDbContext();
 
             var identity = await userSessionEnvironment.GetCurrentUserIdentityAsync();
 
             if (identity?.IsAuthenticated != true)
                 return null;
 
-            CurrentUser = await db
+            CurrentUser = await provider.DB
                 .Users
                 .FirstOrDefaultAsync(x => x.UserName == identity.Name);
 
             return CurrentUser;
         }
 
-        public async Task<bool> IsAdminAsync(Guid userId, SZDb db = null)
+        public async Task<bool> IsAdminAsync(DBProvider provider, Guid userId)
         {
-            db = db ?? _dBFactory.CreateDbContext();
-            return await db.UserRoles
+            return await provider.DB.UserRoles
                 .AnyAsync(x => x.UserId == userId
                 && x.RoleId == Settings.Roles.AdminId);
         }
 
-        public async Task<Result<string>> GeneratePasswordAsync(ISZScopeEnvironment userSessionEnvironment, Guid userId, SZDb db = null)
+        public async Task<Result<string>> GeneratePasswordAsync(DBProvider provider, ISZScopeEnvironment userSessionEnvironment, Guid userId)
         {
-            db = db ?? _dBFactory.CreateDbContext();
             var result = new Result<string>(_logger);
 
-            var currentUser = await GetCurrentUserAsync(userSessionEnvironment, db);
+            var currentUser = await GetCurrentUserAsync(provider, userSessionEnvironment);
 
             if (currentUser == null)
                 return result.AddError("Войдите в систему", $"Попытка смены пароля пользователю {userId} неавторизованным пользователем");
 
-            var isAdmin = await IsAdminAsync(currentUser.Id, db);
+            var isAdmin = await IsAdminAsync(provider, currentUser.Id);
 
             if (!isAdmin && currentUser.Id != userId)
                 return result.AddError("Нет права смены пароля", $"Попытка смены пароля пользователю {userId} пользователем {currentUser.Id}, не имеющим на это прав");
 
-            var dbUser = await db
+            var dbUser = await provider.DB
                 .Users.FindAsync(userId);
 
             if (dbUser == null)
@@ -85,7 +79,7 @@ namespace SZ.Core
 
             try
             {
-                var a = await db.SaveChangesAsync();
+                var a = await provider.DB.SaveChangesAsync();
 
                 if (a == 0)
                 {

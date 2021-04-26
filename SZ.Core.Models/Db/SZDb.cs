@@ -84,7 +84,12 @@ namespace SZ.Core.Models.Db
                 var saveCounter = 5;
                 do
                 {
-                    var maxId = await dbset.MaxAsync(x => x.ShowId);
+                    int maxId;
+
+                    if (await dbset.AnyAsync())
+                        maxId = await dbset.MaxAsync(x => x.ShowId);
+                    else
+                        maxId = 0;
 
                     try
                     {
