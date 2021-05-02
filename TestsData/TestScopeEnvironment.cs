@@ -6,7 +6,7 @@ using SZ.Core.Models.Db;
 
 namespace TestData
 {
-    public class TestScopeEnvironment : ISZScopeEnvironment
+    public class TestScopeEnvironment : IUserSessionService
     {
         IIdentity Identity;
         /// <summary>

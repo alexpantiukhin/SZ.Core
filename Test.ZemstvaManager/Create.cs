@@ -14,8 +14,13 @@ namespace Test.ZemstvaManager
     public class Create
     {
         TestSingletonEnvironment environment = new TestSingletonEnvironment();
-        SZ.Core.ZemstvaManager _manager = new SZ.Core.ZemstvaManager(new UserManager(new TestSingletonEnvironment(), null));
+        SZ.Core.ZemstvaManager _manager;
         TestDBFactory factory = new TestDBFactory();
+
+        public Create()
+        {
+            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null));
+        }
 
         [Fact]
         public async Task CurrentUserIsAdmin_ReturnInstance()
