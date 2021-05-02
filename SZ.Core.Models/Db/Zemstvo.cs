@@ -18,27 +18,27 @@ namespace SZ.Core.Models.Db
         //}
         public Guid Id { get; set; }
         public string Name { get; set; }
-        /// <summary>
-        /// Id вышестоящего Земства
-        /// </summary>
-        public Guid? ParentZemstvoId { get; set; }
+        ///// <summary>
+        ///// Id вышестоящего Земства
+        ///// </summary>
+        //public Guid? ParentZemstvoId { get; set; }
         ///// <summary>
         ///// Круг земства (местный - 1, региональный - 2, федеральный - 3)
         ///// </summary>
         //public byte Circle { get; set; }
         /// <summary>
-        /// Процент членов десятки, присутствующих на собрании десятки, который
+        /// Доля членов десятки, присутствующих на собрании десятки, который
         /// определяет кворум
         /// </summary>
         public double QuorumMeetingTen { get; set; }
         /// <summary>
-        /// Процент членов десятки, которые проголосовали за какой-либо вопрос,
+        /// Доля членов десятки, которые проголосовали за какой-либо вопрос,
         /// необходимый для принятия этого вопроса
         /// </summary>
         public double QuorumVotingTen { get; set; }
 
         /// <summary>
-        /// Количество поддесяток, которые должны обсудить вопрос, прежде, чем к его обсуждению
+        /// Доля поддесяток, которые должны обсудить вопрос, прежде, чем к его обсуждению
         /// приступит десятка следующего круга
         /// </summary>
         public double QuorumTensForQuestion { get; set; }
@@ -73,10 +73,10 @@ namespace SZ.Core.Models.Db
 
 
 
-        /// <summary>
-        /// Вышестоящее Земство
-        /// </summary>
-        public Zemstvo ParentZemstvo { get; set; }
+        ///// <summary>
+        ///// Вышестоящее Земство
+        ///// </summary>
+        //public Zemstvo ParentZemstvo { get; set; }
 
         /// <summary>
         /// Десятки Земства

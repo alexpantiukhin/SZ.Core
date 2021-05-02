@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SZ.Core.Abstractions.Interfaces
 {
-    public interface ISZScopeEnvironment
+    public interface IUserSessionService
     {
         Task<IIdentity> GetCurrentUserIdentityAsync();
     }

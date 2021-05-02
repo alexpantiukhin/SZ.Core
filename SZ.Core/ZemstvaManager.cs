@@ -26,14 +26,14 @@ namespace SZ.Core
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
 
-        public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] ISZScopeEnvironment scopeEnvironment, [NotNull] string zemstvoName)
+        public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] string zemstvoName)
         {
             var result = new Result<Zemstvo>(_logger);
 
             if (string.IsNullOrWhiteSpace(zemstvoName))
                 return result.AddError("Не передано имя земства");
 
-            var currentUser = await _userManager.GetCurrentUserAsync(provider, scopeEnvironment);
+            var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
 
             if (currentUser == null)
                 return result.AddError("Текущий пользователь не определён");
@@ -44,7 +44,12 @@ namespace SZ.Core
             var newZemstvo = new Zemstvo
             {
                 Id = Guid.NewGuid(),
-                Name = zemstvoName
+                Name = zemstvoName,
+                AutoConfirmProtocolCircle = 1,
+                QuorumMeetingTen = 2/3,
+                QuorumTensForQuestion = 2/3,
+                RequirePaperCircle = 1,
+                QuorumVotingTen = 2/3
             };
 
             var addedResult = await provider.DB.AddEntityAsync(newZemstvo);
@@ -53,6 +58,11 @@ namespace SZ.Core
                 return result.AddError("Ошибка создания земства");
 
             return result.AddModel(newZemstvo);
+        }
+
+        public async Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
+        {
+            throw new Exception("lkdjf");
         }
     }
 }

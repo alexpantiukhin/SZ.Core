@@ -29,7 +29,7 @@ namespace SZ.Core
         }
 
 
-        public async Task<User> GetCurrentUserAsync(DBProvider provider, ISZScopeEnvironment userSessionEnvironment)
+        public async Task<User> GetCurrentUserAsync(DBProvider provider, IUserSessionService userSessionEnvironment)
         {
             if (CurrentUser != null)
                 return CurrentUser;
@@ -53,7 +53,7 @@ namespace SZ.Core
                 && x.RoleId == Settings.Roles.AdminId);
         }
 
-        public async Task<Result<string>> GeneratePasswordAsync(DBProvider provider, ISZScopeEnvironment userSessionEnvironment, Guid userId)
+        public async Task<Result<string>> GeneratePasswordAsync(DBProvider provider, IUserSessionService userSessionEnvironment, Guid userId)
         {
             var result = new Result<string>(_logger);
 

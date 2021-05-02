@@ -14,9 +14,16 @@ namespace SZ.Core.Abstractions.Interfaces
         /// Создаёт земство
         /// </summary>
         /// <param name="provider">провайдер бд</param>
-        /// <param name="scopeEnvironment">окружение с текущим пользователем</param>
+        /// <param name="userSessionService">окружение с текущим пользователем</param>
         /// <param name="zemstvoName">Название земства</param>
         /// <returns>Созданное земство</returns>
-        Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] ISZScopeEnvironment scopeEnvironment,[NotNull] string zemstvoName);
+        Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,[NotNull] string zemstvoName);
+        /// <summary>
+        /// Возвращает земство по showId
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="userSessionService"></param>
+        /// <returns></returns>
+        Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId);
     }
 }

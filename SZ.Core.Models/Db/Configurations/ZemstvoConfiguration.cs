@@ -19,10 +19,10 @@ namespace SZ.Core.Models.Configurations
                 .IsRequired()
                 .HasMaxLength(250);
 
-            builder.HasOne(x => x.ParentZemstvo)
-                .WithMany(x => x.ChildZemvstvs)
-                .HasForeignKey(x => x.ParentZemstvoId)
-                .OnDelete(DeleteBehavior.NoAction);
+            //builder.HasOne(x => x.ParentZemstvo)
+            //    .WithMany(x => x.ChildZemvstvs)
+            //    .HasForeignKey(x => x.ParentZemstvoId)
+            //    .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
