@@ -5,7 +5,7 @@ using System;
 
 using SZ.Core.Constants;
 using SZ.Core.Models.Db;
-
+    
 namespace TestData
 {
     public class TestDBFactory : IDbContextFactory<SZDb>
