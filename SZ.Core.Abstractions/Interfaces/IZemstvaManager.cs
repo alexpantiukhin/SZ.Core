@@ -1,6 +1,7 @@
 ﻿using Al;
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 
 using SZ.Core.Models;
@@ -25,5 +26,13 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="userSessionService"></param>
         /// <returns></returns>
         Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId);
+
+        /// <summary>
+        /// Возвращает земства, в которых в данный момент состоит пользователь
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="userSessionService"></param>
+        /// <returns></returns>
+        Task<IQueryable<Zemstvo>> GetUserZemstva([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService);
     }
 }

@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 using System;
 
-using SZ.Core.Constants;
 using SZ.Core.Models.Db;
 
 namespace TestData

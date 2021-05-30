@@ -18,11 +18,11 @@ namespace SZ.Core
 {
     public class ZemstvaManager : IZemstvaManager
     {
-        readonly UserManager _userManager;
+        readonly IUserManager _userManager;
         readonly ILogger _logger;
-        public ZemstvaManager(UserManager userManager, ILoggerFactory loggerFactory = null)
+        public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory = null)
         {
-            _userManager = userManager;
+            _userManager = userManager; 
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
 
@@ -63,6 +63,20 @@ namespace SZ.Core
         public async Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
         {
             throw new Exception("lkdjf");
+        }
+
+        public async Task<IQueryable<Zemstvo>> GetUserZemstva([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService)
+        {
+            var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
+
+            if (currentUser == null)
+                return null;
+
+
+            //TODO проверку на повторяющиеся земства, если в нескольких десятках состоит
+            return provider.DB.UserTens
+                .Where(x => x.UserId == currentUser.Id && x.Ten.Circle == 1 && x.BasisExitDocumentId == null)
+                .Select(x => x.Ten.Zemstvo).Distinct();
         }
     }
 }
