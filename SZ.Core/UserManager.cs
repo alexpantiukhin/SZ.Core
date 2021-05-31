@@ -19,8 +19,6 @@ namespace SZ.Core
         readonly ISZSingletonEnvironment _environment;
         readonly ILogger _logger;
 
-        User CurrentUser = null;
-
         public UserManager(ISZSingletonEnvironment environment,
             ILoggerFactory loggerFactory)
         {
@@ -31,19 +29,16 @@ namespace SZ.Core
 
         public async Task<User> GetCurrentUserAsync(DBProvider provider, IUserSessionService userSessionEnvironment)
         {
-            if (CurrentUser != null)
-                return CurrentUser;
-
             var identity = await userSessionEnvironment.GetCurrentUserIdentityAsync();
 
             if (identity?.IsAuthenticated != true)
                 return null;
 
-            CurrentUser = await provider.DB
+            var currentUser = await provider.DB
                 .Users
                 .FirstOrDefaultAsync(x => x.UserName == identity.Name);
 
-            return CurrentUser;
+            return currentUser;
         }
 
         public async Task<bool> IsAdminAsync(DBProvider provider, Guid userId)
