@@ -65,7 +65,7 @@ namespace SZ.Core
             throw new Exception("lkdjf");
         }
 
-        public async Task<IQueryable<Zemstvo>> GetUserZemstva([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService)
+        public async Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
 

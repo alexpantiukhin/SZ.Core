@@ -1,9 +1,17 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Threading.Tasks;
+
+using SZ.Core.Models.Db;
 
 namespace SZ.Core.Abstractions.Interfaces
 {
     public interface IActiveZemstvoService
     {
-        Guid? ActiveZemstvo { get; set; }
+        Guid? ActiveZemstvo { get; }
+        int[] UserZemstva { get; }
+
+        Task Init(IUserSessionService userSessionService, IDbContextFactory<SZDb> dbContextFactory, IZemstvaManager zemstvaManager);
     }
 }

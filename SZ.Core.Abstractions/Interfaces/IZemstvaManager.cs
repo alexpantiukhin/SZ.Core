@@ -33,6 +33,6 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="provider"></param>
         /// <param name="userSessionService"></param>
         /// <returns></returns>
-        Task<IQueryable<Zemstvo>> GetUserZemstva([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService);
+        Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService);
     }
 }
