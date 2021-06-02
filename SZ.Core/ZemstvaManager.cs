@@ -78,5 +78,15 @@ namespace SZ.Core
                 .Where(x => x.UserId == currentUser.Id && x.Ten.Circle == 1 && x.BasisExitDocumentId == null)
                 .Select(x => x.Ten.Zemstvo).Distinct();
         }
+
+        public async Task<IQueryable<Zemstvo>> GetAllZemstvaAsync([NotNull] DBProvider provider, IUserSessionService userSessionService)
+        {
+            var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
+
+            if (currentUser == null)
+                return null;
+
+            return provider.DB.Zemstvos;
+        }
     }
 }

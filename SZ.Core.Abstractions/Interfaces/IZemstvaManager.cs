@@ -34,5 +34,7 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="userSessionService"></param>
         /// <returns></returns>
         Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService);
+
+        Task<IQueryable<Zemstvo>> GetAllZemstvaAsync([NotNull] DBProvider provider, IUserSessionService userSessionService);
     }
 }

@@ -20,13 +20,13 @@ namespace SZ.Core.Constants
                 }
             }
 
-            public static readonly string AdminUserName = "Admin";
+            public const string AdminUserName = "Admin";
             /// <summary>
             /// 1234Qwerty
             /// </summary>
-            public static readonly string AdminPasswordHash = "AQAAAAEAACcQAAAAEH9dgPH6SQn9mAIxe0xAe76PCChqoGhiMrkFyv3t39xdwnTgz6OK1FEQPbCsNKGzZg==";
-            public static readonly string AdminConcurrencyStamp = "2177d55a-454a-4bec-8631-8f9e79767a64";
-            public static readonly string AdminSecurityStamp = "7FI7SGIK5V7WVU7FPQXRCTS5DH3YXH2C";
+            public const string AdminPasswordHash = "AQAAAAEAACcQAAAAEH9dgPH6SQn9mAIxe0xAe76PCChqoGhiMrkFyv3t39xdwnTgz6OK1FEQPbCsNKGzZg==";
+            public const string AdminConcurrencyStamp = "2177d55a-454a-4bec-8631-8f9e79767a64";
+            public const string AdminSecurityStamp = "7FI7SGIK5V7WVU7FPQXRCTS5DH3YXH2C";
         }
 
         public static class Roles
@@ -42,7 +42,7 @@ namespace SZ.Core.Constants
                     return _AdminId;
                 }
             }
-            public static readonly string AdminConcurrencyStamp = "8daaf047-c435-4e0e-8185-a941bbd96f75";
+            public const string AdminConcurrencyStamp = "8daaf047-c435-4e0e-8185-a941bbd96f75";
         }
         public static PasswordOptions PasswordOptions => new PasswordOptions
         {
