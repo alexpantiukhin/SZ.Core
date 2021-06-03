@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using SZ.Core.Abstractions.Interfaces;
@@ -57,17 +55,61 @@ namespace SZ.Core
             if (!addedResult)
                 return result.AddError("Ошибка создания земства");
 
-            return result.AddModel(newZemstvo);
+            return result.AddModel(newZemstvo, $"Земство {newZemstvo.Name} создано");
         }
-        public Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo zemstvo)
+        public async Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo model)
         {
-            throw new NotImplementedException();
+            Result<Zemstvo> result = new Result<Zemstvo>(_logger);
+            try
+            {
+                var zemstvo = await provider.DB.Zemstvos.FindAsync(model.Id);
+
+                if (zemstvo == null)
+                    return result.AddError($"Земства с id {model.ShowId} не существует");
+
+                zemstvo.Name = model.Name;
+                zemstvo.QuorumVotingTen = model.QuorumVotingTen;
+                zemstvo.RequirePaperCircle = model.RequirePaperCircle;
+                zemstvo.AutoConfirmProtocolCircle = model.AutoConfirmProtocolCircle;
+                zemstvo.QuorumMeetingTen = model.QuorumMeetingTen;
+                zemstvo.QuorumTensForQuestion = model.QuorumTensForQuestion;
+
+                var saveResult = await provider.DB.SaveChangesAsync();
+
+                return result.AddModel(zemstvo, "Изменения земства сохранены");
+            }
+            catch (Exception e)
+            {
+                return result.AddError(e, "Ошибка изменения земства");
+            }
+        }
+        
+        public async Task<Result<object>> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
+        {
+            Result<object> result = new Result<object>(_logger);
+
+            try
+            {
+                var zemstvo = await provider.DB.Zemstvos.FindAsync(id);
+
+                if (zemstvo == null)
+                    return result.AddModel(true, "Земство удалено");
+
+                var a = provider.DB.Zemstvos.Remove(zemstvo);
+
+                var deleteResult = await provider.DB.SaveChangesAsync();
+
+                return result.AddModel(true, "Земство удалено");
+            }
+            catch (Exception e)
+            {
+                return result.AddError(e, "Ошибка удаления земства");
+            }
         }
 
-
-        public async Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
+        public Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
         {
-            throw new Exception("lkdjf");
+            return provider.DB.Zemstvos.FirstOrDefaultAsync(x => x.ShowId == showId);
         }
 
         public async Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService)
@@ -93,6 +135,5 @@ namespace SZ.Core
 
             return provider.DB.Zemstvos;
         }
-
     }
 }

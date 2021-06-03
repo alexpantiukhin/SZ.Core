@@ -1,5 +1,6 @@
 ﻿using Al;
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +27,15 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="userSessionService">окружение с текущим пользователем</param>
         /// <param name="zemstvo">Модель земства</param>
         /// <returns>Созданное земство</returns>
-        Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo zemstvo);
+        Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo model);
+        /// <summary>
+        /// Удаляет земство
+        /// </summary>
+        /// <param name="provider">провайдер бд</param>
+        /// <param name="userSessionService">окружение с текущим пользователем</param>
+        /// <param name="id">id земства</param>
+        /// <returns>Созданное земство</returns>
+        Task<Result<object>> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id);
         /// <summary>
         /// Возвращает земство по showId
         /// </summary>
