@@ -16,7 +16,7 @@ namespace SZ.Core.Abstractions.Interfaces
             [NotNull] TCreate model, bool withTransaction, CancellationToken cancellationToken = default);
         Task<Result<T>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
             [NotNull] TUpdate model, CancellationToken cancellationToken = default);
-        Task<Result<object>> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
+        Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
             [NotNull] TDelete model, CancellationToken cancellationToken = default);
     }
 }

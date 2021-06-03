@@ -24,12 +24,30 @@ namespace SZ.Core
         public Func<Result<T>, DBProvider, TCreate, CancellationToken, Task> ValidCreateModel { get; init; }
         public Func<Result<T>, DBProvider, TUpdate, CancellationToken, Task> ValidUpdateModel { get; init; }
         public Func<Result<T>, DBProvider, TDelete, CancellationToken, Task> ValidDeleteModel { get; init; }
+        /// <summary>
+        /// Валидация права создания сущности. Коды ошибок от 100-199
+        /// </summary>
         public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> ValidCreateRight { get; init; }
+        /// <summary>
+        /// Валидация права изменения сущности. Коды ошибок от 100-199
+        /// </summary>
         public Func<Result<T>, DBProvider, TUpdate, IUserSessionService, CancellationToken, Task> ValidUpdateRight { get; init; }
+        /// <summary>
+        /// Валидация права удаления сущности. Коды ошибок от 100-199
+        /// </summary>
         public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task> ValidDeleteRight { get; init; }
-        public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task<T>> Create { get; init; }
-        public Func<Result<T>, DBProvider, TUpdate, IUserSessionService, CancellationToken, Task> Update { get; init; }
-        public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task> Delete { get; init; }
+        /// <summary>
+        /// Операция подготовки создания сущности. Коды ошибок 400-499
+        /// </summary>
+        public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task<T>> PrepareCreate { get; init; }
+        /// <summary>
+        /// Операция подготовки изменения сущности. Коды ошибок 400-499
+        /// </summary>
+        public Func<Result<T>, DBProvider, TUpdate, IUserSessionService, CancellationToken, Task> PrepareUpdate { get; init; }
+        /// <summary>
+        /// Операция подготовки удаления сущности. Коды ошибок 400-499
+        /// </summary>
+        public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task> PrepareDelete { get; init; }
 
 
 
@@ -56,10 +74,10 @@ namespace SZ.Core
                         return result;
                 }
 
-                if (Create == null)
+                if (PrepareCreate == null)
                     return result.AddError("Ошибка создания", "Создание сущности не реализовано", 1);
 
-                var entity = await Create(result, provider, model, userSessionService, cancellationToken);
+                var entity = await PrepareCreate(result, provider, model, userSessionService, cancellationToken);
 
                 if (!result.Success)
                     return result;

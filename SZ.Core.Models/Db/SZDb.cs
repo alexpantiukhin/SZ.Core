@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Al;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -73,15 +75,16 @@ namespace SZ.Core.Models.Db
             _withoutMigrations = withoutMigrations;
         }
 
-        public async Task<bool> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
+        public async Task<Result> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
         {
+            var result = new Result(_logger);
             try
             {
                 var dbset = Set<T>();
 
                 await dbset.AddAsync(entity, cancellationToken);
 
-                // даётся 10 попыток записать сущность
+                // даётся 5 попыток записать сущность
                 var saveCounter = 5;
                 do
                 {
@@ -100,7 +103,12 @@ namespace SZ.Core.Models.Db
                         entity.ShowId = ++maxId;
 
                         await SaveChangesAsync(cancellationToken);
-                        return true;
+
+                        return result;
+                    }
+                    catch (TaskCanceledException e)
+                    {
+                        return result.AddError(e, "Операция отменена");
                     }
                     catch (Exception e)
                     {
@@ -109,12 +117,16 @@ namespace SZ.Core.Models.Db
                     saveCounter--;
                 } while (saveCounter > 0);
             }
+            catch (TaskCanceledException e)
+            {
+                return result.AddError(e, "Операция отменена");
+            }
             catch (Exception e)
             {
-                _logger?.LogError(e, $"Error added entity {typeof(T).Name}");
+                return result.AddError(e, "Ошибка добавления");
             }
 
-            return false;
+            return result.AddError("Не удалось выполнить операцию";
         }
 
         public struct LengthRequirements

@@ -91,22 +91,26 @@ namespace SZ.Core
             }
         }
         
-        public async Task<Result<object>> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
+        public async Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
         {
-            Result<object> result = new Result<object>(_logger);
+            Result result = new Result(_logger);
+            Zemstvo zemstvo = null;
 
             try
             {
-                var zemstvo = await provider.DB.Zemstvos.FindAsync(id);
+                zemstvo = await provider.DB.Zemstvos.FindAsync(id);
 
-                if (zemstvo == null)
-                    return result.AddModel(true, "Земство удалено");
+                if (zemstvo != null)
+                {
+                    var a = provider.DB.Zemstvos.Remove(zemstvo);
 
-                var a = provider.DB.Zemstvos.Remove(zemstvo);
+                    var deleteResult = await provider.DB.SaveChangesAsync();
 
-                var deleteResult = await provider.DB.SaveChangesAsync();
+                    if (deleteResult == 0)
+                        return result.AddError("Земство не удалено", "При удалении земства в базе не произошло изменений");
+                }
 
-                return result.AddModel(true, "Земство удалено");
+                return result.AddSuccess("Земство удалено", null, LogLevel.Information);
             }
             catch (Exception e)
             {
