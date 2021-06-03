@@ -21,6 +21,13 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <returns>Созданное земство</returns>
         Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,[NotNull] string zemstvoName);
         /// <summary>
+        /// Валидация модели создания земства
+        /// </summary>
+        /// <param name="result">Изменяемый результат</param>
+        /// <param name="zemstvoName">Название земства</param>
+        /// <returns>Созданное земство</returns>
+        void ValidCreateAsync(in Result<Zemstvo> result, [NotNull] string zemstvoName);
+        /// <summary>
         /// Изменяет земство
         /// </summary>
         /// <param name="provider">провайдер бд</param>

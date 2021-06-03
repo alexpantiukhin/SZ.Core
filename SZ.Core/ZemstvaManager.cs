@@ -20,7 +20,7 @@ namespace SZ.Core
         readonly ILogger _logger;
         public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory = null)
         {
-            _userManager = userManager; 
+            _userManager = userManager;
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
 
@@ -28,8 +28,10 @@ namespace SZ.Core
         {
             var result = new Result<Zemstvo>(_logger);
 
-            if (string.IsNullOrWhiteSpace(zemstvoName))
-                return result.AddError("Не передано имя земства");
+            ValidCreateAsync(result, zemstvoName);
+
+            if (!result.Success)
+                return result;
 
             var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
 
@@ -44,10 +46,10 @@ namespace SZ.Core
                 Id = Guid.NewGuid(),
                 Name = zemstvoName,
                 AutoConfirmProtocolCircle = 1,
-                QuorumMeetingTen = 2/3,
-                QuorumTensForQuestion = 2/3,
+                QuorumMeetingTen = 2 / 3,
+                QuorumTensForQuestion = 2 / 3,
                 RequirePaperCircle = 1,
-                QuorumVotingTen = 2/3
+                QuorumVotingTen = 2 / 3
             };
 
             var addedResult = await provider.DB.AddEntityAsync(newZemstvo);
@@ -56,6 +58,11 @@ namespace SZ.Core
                 return result.AddError("Ошибка создания земства");
 
             return result.AddModel(newZemstvo, $"Земство {newZemstvo.Name} создано");
+        }
+        public void ValidCreateAsync([NotNull] in Result<Zemstvo> result, [NotNull] string zemstvoName)
+        {
+            if (string.IsNullOrWhiteSpace(zemstvoName))
+                result.AddError("Не передано имя земства");
         }
         public async Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo model)
         {
@@ -135,5 +142,6 @@ namespace SZ.Core
 
             return provider.DB.Zemstvos;
         }
+
     }
 }

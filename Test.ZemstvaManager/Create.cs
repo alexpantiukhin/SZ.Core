@@ -23,7 +23,7 @@ namespace Test.ZemstvaManager
         }
 
         [Fact]
-        public async Task CurrentUserIsAdmin_ReturnInstance()
+        public async Task CurrentUserIsAdmin_ResultSuccessWithModel()
         {
             //arrange
             var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
@@ -39,7 +39,7 @@ namespace Test.ZemstvaManager
         }
 
         [Fact]
-        public async Task CurrentUserIsNotAdmin_ReturnNull()
+        public async Task CurrentUserIsNotAdmin_ResultNotSuccess()
         {
             //arrange
             var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, false);
@@ -54,7 +54,7 @@ namespace Test.ZemstvaManager
         }
 
         [Fact]
-        public async Task CurrentUserIsAdminNullName_ReturnNull()
+        public async Task CurrentUserIsAdminNullName_ResultNotSuccess()
         {
             //arrange
             var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
