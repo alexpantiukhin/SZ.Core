@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Models.Configurations;
@@ -72,29 +73,33 @@ namespace SZ.Core.Models.Db
             _withoutMigrations = withoutMigrations;
         }
 
-        public async Task<bool> AddEntityAsync<T>(T entity) where T : class, IDBEntity
+        public async Task<bool> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
         {
             try
             {
                 var dbset = Set<T>();
 
-                await dbset.AddAsync(entity);
+                await dbset.AddAsync(entity, cancellationToken);
 
                 // даётся 10 попыток записать сущность
                 var saveCounter = 5;
                 do
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                        throw new TaskCanceledException();
+
                     int maxId;
 
-                    if (await dbset.AnyAsync())
-                        maxId = await dbset.MaxAsync(x => x.ShowId);
+                    if (await dbset.AnyAsync(cancellationToken))
+                        maxId = await dbset.MaxAsync(x => x.ShowId, cancellationToken);
                     else
                         maxId = 0;
 
                     try
                     {
                         entity.ShowId = ++maxId;
-                        await SaveChangesAsync();
+
+                        await SaveChangesAsync(cancellationToken);
                         return true;
                     }
                     catch (Exception e)

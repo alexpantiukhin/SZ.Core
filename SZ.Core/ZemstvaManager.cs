@@ -28,11 +28,6 @@ namespace SZ.Core
         {
             var result = new Result<Zemstvo>(_logger);
 
-            ValidCreateAsync(result, zemstvoName);
-
-            if (!result.Success)
-                return result;
-
             var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
 
             if (currentUser == null)
@@ -40,6 +35,11 @@ namespace SZ.Core
 
             if (!await _userManager.IsAdminAsync(provider, currentUser.Id))
                 return result.AddError("Только админ может создавать земства");
+
+            ValidCreateAsync(result, zemstvoName);
+
+            if (!result.Success)
+                return result;
 
             var newZemstvo = new Zemstvo
             {
