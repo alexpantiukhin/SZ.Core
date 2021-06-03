@@ -20,6 +20,14 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <returns>Созданное земство</returns>
         Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,[NotNull] string zemstvoName);
         /// <summary>
+        /// Изменяет земство
+        /// </summary>
+        /// <param name="provider">провайдер бд</param>
+        /// <param name="userSessionService">окружение с текущим пользователем</param>
+        /// <param name="zemstvo">Модель земства</param>
+        /// <returns>Созданное земство</returns>
+        Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo zemstvo);
+        /// <summary>
         /// Возвращает земство по showId
         /// </summary>
         /// <param name="provider"></param>

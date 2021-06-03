@@ -59,6 +59,11 @@ namespace SZ.Core
 
             return result.AddModel(newZemstvo);
         }
+        public Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo zemstvo)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public async Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
         {
@@ -88,5 +93,6 @@ namespace SZ.Core
 
             return provider.DB.Zemstvos;
         }
+
     }
 }

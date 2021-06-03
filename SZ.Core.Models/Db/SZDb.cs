@@ -93,7 +93,7 @@ namespace SZ.Core.Models.Db
 
                     try
                     {
-                        entity.ShowId = maxId;
+                        entity.ShowId = ++maxId;
                         await SaveChangesAsync();
                         return true;
                     }
