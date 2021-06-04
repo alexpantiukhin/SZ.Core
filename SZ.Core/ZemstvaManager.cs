@@ -16,10 +16,15 @@ namespace SZ.Core
 {
     public class ZemstvaManager : IZemstvaManager
     {
+        ICRUDManager<Zemstvo, string, object, object> CRUDManager;
         readonly IUserManager _userManager;
         readonly ILogger _logger;
         public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory = null)
         {
+            CRUDManager = new CRUDManager<Zemstvo, string, object, object>(loggerFactory)
+            {
+                
+            };
             _userManager = userManager;
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
@@ -54,7 +59,7 @@ namespace SZ.Core
 
             var addedResult = await provider.DB.AddEntityAsync(newZemstvo);
 
-            if (!addedResult)
+            if (!addedResult.Success)
                 return result.AddError("Ошибка создания земства");
 
             return result.AddModel(newZemstvo, $"Земство {newZemstvo.Name} создано");

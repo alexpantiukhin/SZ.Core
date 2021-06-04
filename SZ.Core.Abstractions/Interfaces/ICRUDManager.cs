@@ -13,7 +13,7 @@ namespace SZ.Core.Abstractions.Interfaces
         where T : class, IDBEntity
     {
         Task<Result<T>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
-            [NotNull] TCreate model, bool withTransaction, CancellationToken cancellationToken = default);
+            [NotNull] TCreate model, CancellationToken cancellationToken = default);
         Task<Result<T>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
             [NotNull] TUpdate model, CancellationToken cancellationToken = default);
         Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,

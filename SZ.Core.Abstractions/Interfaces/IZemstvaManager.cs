@@ -42,7 +42,7 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="userSessionService">окружение с текущим пользователем</param>
         /// <param name="id">id земства</param>
         /// <returns>Созданное земство</returns>
-        Task<Result<object>> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id);
+        Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id);
         /// <summary>
         /// Возвращает земство по showId
         /// </summary>

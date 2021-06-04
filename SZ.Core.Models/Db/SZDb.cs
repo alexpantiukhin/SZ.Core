@@ -126,7 +126,7 @@ namespace SZ.Core.Models.Db
                 return result.AddError(e, "Ошибка добавления");
             }
 
-            return result.AddError("Не удалось выполнить операцию";
+            return result.AddError("Не удалось выполнить операцию");
         }
 
         public struct LengthRequirements

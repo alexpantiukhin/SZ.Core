@@ -82,7 +82,7 @@ namespace SZ.Core
                     return result;
                 }
 
-                result.Model = newPass;
+                result.AddModel(newPass);
 
                 return result;
             }
