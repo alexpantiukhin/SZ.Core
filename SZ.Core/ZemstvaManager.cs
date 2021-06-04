@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Abstractions.Interfaces;
@@ -16,40 +17,28 @@ namespace SZ.Core
 {
     public class ZemstvaManager : IZemstvaManager
     {
-        ICRUDManager<Zemstvo, string, object, object> CRUDManager;
+        ICRUDManager<Zemstvo, string, Zemstvo, Guid> CRUDManager;
         readonly IUserManager _userManager;
         readonly ILogger _logger;
         public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory = null)
         {
-            CRUDManager = new CRUDManager<Zemstvo, string, object, object>(loggerFactory)
+            CRUDManager = new CRUDManager<Zemstvo, string, Zemstvo, Guid>(loggerFactory)
             {
-                
+                ValidCreateModel = ValidCreateModel,
+                ValidCreateRight = ValidCreateRight,
+                PrepareCreate = PrepareCreate
             };
             _userManager = userManager;
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
 
-        public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] string zemstvoName)
+        Task<Zemstvo> PrepareCreate(Result<Zemstvo> result, DBProvider dBProvider, string name,
+            IUserSessionService userSessionService, CancellationToken cancellationToken)
         {
-            var result = new Result<Zemstvo>(_logger);
-
-            var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
-
-            if (currentUser == null)
-                return result.AddError("Текущий пользователь не определён");
-
-            if (!await _userManager.IsAdminAsync(provider, currentUser.Id))
-                return result.AddError("Только админ может создавать земства");
-
-            ValidCreateAsync(result, zemstvoName);
-
-            if (!result.Success)
-                return result;
-
             var newZemstvo = new Zemstvo
             {
                 Id = Guid.NewGuid(),
-                Name = zemstvoName,
+                Name = name,
                 AutoConfirmProtocolCircle = 1,
                 QuorumMeetingTen = 2 / 3,
                 QuorumTensForQuestion = 2 / 3,
@@ -57,18 +46,61 @@ namespace SZ.Core
                 QuorumVotingTen = 2 / 3
             };
 
-            var addedResult = await provider.DB.AddEntityAsync(newZemstvo);
-
-            if (!addedResult.Success)
-                return result.AddError("Ошибка создания земства");
-
-            return result.AddModel(newZemstvo, $"Земство {newZemstvo.Name} создано");
+            return Task.FromResult(newZemstvo);
         }
-        public void ValidCreateAsync([NotNull] in Result<Zemstvo> result, [NotNull] string zemstvoName)
+
+        public async Task ValidCreateRight(Result<Zemstvo> result, DBProvider dBProvider, string zemstvoName,
+            IUserSessionService userSessionService, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(zemstvoName))
-                result.AddError("Не передано имя земства");
+            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, userSessionService);
+
+            if (currentUser == null)
+                result.AddError("Текущий пользователь не определён");
+
+            if (!await _userManager.IsAdminAsync(dBProvider, currentUser.Id))
+                result.AddError("Только админ может создавать земства");
         }
+
+        Task ValidCreateModel(Result<Zemstvo> result, DBProvider dBProvider, string name, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                result.AddError("Не передано имя земства");
+
+            return Task.CompletedTask;
+        }
+
+        public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
+            [NotNull] string zemstvoName, CancellationToken cancellationToken = default)
+        {
+            return await CRUDManager.CreateAsync(provider, userSessionService, zemstvoName, cancellationToken);
+
+            //var result = new Result<Zemstvo>(_logger);
+
+
+            //ValidCreateAsync(result, zemstvoName);
+
+            //if (!result.Success)
+            //    return result;
+
+            //var newZemstvo = new Zemstvo
+            //{
+            //    Id = Guid.NewGuid(),
+            //    Name = zemstvoName,
+            //    AutoConfirmProtocolCircle = 1,
+            //    QuorumMeetingTen = 2 / 3,
+            //    QuorumTensForQuestion = 2 / 3,
+            //    RequirePaperCircle = 1,
+            //    QuorumVotingTen = 2 / 3
+            //};
+
+            //var addedResult = await provider.DB.AddEntityAsync(newZemstvo);
+
+            //if (!addedResult.Success)
+            //    return result.AddError("Ошибка создания земства");
+
+            //return result.AddModel(newZemstvo, $"Земство {newZemstvo.Name} создано");
+        }
+
         public async Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo model)
         {
             Result<Zemstvo> result = new Result<Zemstvo>(_logger);

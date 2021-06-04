@@ -82,7 +82,7 @@ namespace SZ.Core
 
                 if (ValidCreateModel != null)
                 {
-                    await ValidCreateRight(result, provider, model, userSessionService, cancellationToken);
+                    await ValidCreateModel(result, provider, model, cancellationToken);
 
                     if (!result.Success)
                         return result;
@@ -97,7 +97,7 @@ namespace SZ.Core
                     return result;
 
                 if (entity == null)
-                    return result.AddError("Ошибка создания. Попробуйте снова. Обратитесь к администратору", "Метод создания отработал успешно, но сущность null", 2);
+                    return result.AddError("Ошибка создания. Попробуйте снова или обратитесь к администратору", "Метод создания отработал успешно, но сущность null", 2);
 
                 var addedResult = await provider.DB.AddEntityAsync(entity, cancellationToken);
 
@@ -110,16 +110,16 @@ namespace SZ.Core
                 if (!result.Success)
                     return result;
 
-                return result.AddModel(entity);
+                return result.AddModel(entity, "Запись создана");
 
             }
             catch (TaskCanceledException e)
             {
-                return result.AddError(e, "Операция отменена");
+                return result.AddError(e, "Операция отменена", 3);
             }
             catch (Exception e)
             {
-                return result.AddError(e, "Ошибка создания. Попробуйте снова", 3);
+                return result.AddError(e, "Ошибка создания. Попробуйте снова", 4);
             }
         }
 

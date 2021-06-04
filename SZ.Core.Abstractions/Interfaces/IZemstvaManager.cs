@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Models;
@@ -19,14 +20,14 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="userSessionService">окружение с текущим пользователем</param>
         /// <param name="zemstvoName">Название земства</param>
         /// <returns>Созданное земство</returns>
-        Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,[NotNull] string zemstvoName);
+        Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] string zemstvoName, CancellationToken cancellationToken = default);
         /// <summary>
         /// Валидация модели создания земства
         /// </summary>
         /// <param name="result">Изменяемый результат</param>
         /// <param name="zemstvoName">Название земства</param>
         /// <returns>Созданное земство</returns>
-        void ValidCreateAsync(in Result<Zemstvo> result, [NotNull] string zemstvoName);
+        Task ValidCreateRight(Result<Zemstvo> result, DBProvider dBProvider, string zemstvoName, IUserSessionService userSessionService, CancellationToken cancellationToken);
         /// <summary>
         /// Изменяет земство
         /// </summary>
