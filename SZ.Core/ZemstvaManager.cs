@@ -17,17 +17,12 @@ namespace SZ.Core
 {
     public class ZemstvaManager : IZemstvaManager
     {
-        ICRUDManager<Zemstvo, string, Zemstvo, Guid> CRUDManager;
+        ICRUDManager<Zemstvo, string, Zemstvo, Guid> _CRUDManager;
         readonly IUserManager _userManager;
         readonly ILogger _logger;
         public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory = null)
         {
-            CRUDManager = new CRUDManager<Zemstvo, string, Zemstvo, Guid>(loggerFactory)
-            {
-                ValidCreateModel = ValidCreateModel,
-                ValidCreateRight = ValidCreateRight,
-                PrepareCreate = PrepareCreate
-            };
+            _CRUDManager = new CRUDManager<Zemstvo, string, Zemstvo, Guid>(loggerFactory);
             _userManager = userManager;
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
         }
@@ -72,33 +67,7 @@ namespace SZ.Core
         public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
             [NotNull] string zemstvoName, CancellationToken cancellationToken = default)
         {
-            return await CRUDManager.CreateAsync(provider, userSessionService, zemstvoName, cancellationToken);
-
-            //var result = new Result<Zemstvo>(_logger);
-
-
-            //ValidCreateAsync(result, zemstvoName);
-
-            //if (!result.Success)
-            //    return result;
-
-            //var newZemstvo = new Zemstvo
-            //{
-            //    Id = Guid.NewGuid(),
-            //    Name = zemstvoName,
-            //    AutoConfirmProtocolCircle = 1,
-            //    QuorumMeetingTen = 2 / 3,
-            //    QuorumTensForQuestion = 2 / 3,
-            //    RequirePaperCircle = 1,
-            //    QuorumVotingTen = 2 / 3
-            //};
-
-            //var addedResult = await provider.DB.AddEntityAsync(newZemstvo);
-
-            //if (!addedResult.Success)
-            //    return result.AddError("Ошибка создания земства");
-
-            //return result.AddModel(newZemstvo, $"Земство {newZemstvo.Name} создано");
+            return await _CRUDManager.CreateAsync(this, provider, userSessionService, zemstvoName, cancellationToken);
         }
 
         public async Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo model)
@@ -127,7 +96,7 @@ namespace SZ.Core
                 return result.AddError(e, "Ошибка изменения земства");
             }
         }
-        
+
         public async Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
         {
             Result result = new Result(_logger);
