@@ -21,15 +21,14 @@ namespace SZ.Core
         {
             _logger = loggerFactory?.CreateLogger(GetType());
         }
-        public Func<Result<T>, DBProvider, TCreate, CancellationToken, Task> ValidCreateModel { get; init; }
+        //public Func<Result<T>, DBProvider, TCreate, CancellationToken, Task> ValidCreateModel { get; init; }
         public Func<Result<T>, DBProvider, TUpdate, CancellationToken, Task> ValidUpdateModel { get; init; }
         public Func<Result<T>, DBProvider, TDelete, CancellationToken, Task> ValidDeleteModel { get; init; }
 
-
-        /// <summary>
-        /// Валидация права создания сущности. Коды ошибок от 100-199
-        /// </summary>
-        public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> ValidCreateRight { get; init; }
+        ///// <summary>
+        ///// Валидация права создания сущности. Коды ошибок от 100-199
+        ///// </summary>
+        //public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> ValidCreateRight { get; init; }
         /// <summary>
         /// Валидация права изменения сущности. Коды ошибок от 100-199
         /// </summary>
@@ -38,14 +37,14 @@ namespace SZ.Core
         /// Валидация права удаления сущности. Коды ошибок от 100-199
         /// </summary>
         public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task> ValidDeleteRight { get; init; }
-        /// <summary>
-        /// Операция подготовки создания сущности. Коды ошибок 400-499
-        /// </summary>
-        public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task<T>> PrepareCreate { get; init; }
-        /// <summary>
-        /// Операция подготовки создания сущности. Коды ошибок 400-499
-        /// </summary>
-        public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> PostCreate { get; init; }
+        ///// <summary>
+        ///// Операция подготовки создания сущности. Коды ошибок 400-499
+        ///// </summary>
+        //public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task<T>> PrepareCreate { get; init; }
+        ///// <summary>
+        ///// Операция подготовки создания сущности. Коды ошибок 400-499
+        ///// </summary>
+        //public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> PostCreate { get; init; }
         /// <summary>
         /// Операция подготовки изменения сущности. Коды ошибок 400-499
         /// </summary>
@@ -65,33 +64,27 @@ namespace SZ.Core
 
 
 
-        public async Task<Result<T>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
+        public async Task<Result<T>> CreateAsync([NotNull] ICreateEntityManager<T, TCreate> entityCreator, [NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
             [NotNull] TCreate model, CancellationToken cancellationToken = default)
         {
             var result = new Result<T>(_logger);
 
             try
             {
-                if (ValidCreateRight != null)
-                {
-                    await ValidCreateRight(result, provider, model, userSessionService, cancellationToken);
+                if (entityCreator == null)
+                    return result.AddError("Ошибка создания записи", "Не передан создатель сущностей", 1);
 
-                    if (!result.Success)
-                        return result;
-                }
+                await entityCreator.ValidCreateRight(result, provider, model, userSessionService, cancellationToken);
 
-                if (ValidCreateModel != null)
-                {
-                    await ValidCreateModel(result, provider, model, cancellationToken);
+                if (!result.Success)
+                    return result;
 
-                    if (!result.Success)
-                        return result;
-                }
+                await entityCreator.ValidCreateModel(result, provider, model, cancellationToken);
 
-                if (PrepareCreate == null)
-                    return result.AddError("Ошибка создания", "Подготовка записи не реализована", 1);
+                if (!result.Success)
+                    return result;
 
-                var entity = await PrepareCreate(result, provider, model, userSessionService, cancellationToken);
+                var entity = await entityCreator.PrepareCreate(result, provider, model, userSessionService, cancellationToken);
 
                 if (!result.Success)
                     return result;
@@ -104,8 +97,7 @@ namespace SZ.Core
                 if (!addedResult.Success)
                     return result;
 
-                if (PostCreate != null)
-                    await PostCreate(result, provider, model, userSessionService, cancellationToken);
+                await entityCreator.PostCreate(result, provider, model, userSessionService, cancellationToken);
 
                 if (!result.Success)
                     return result;
