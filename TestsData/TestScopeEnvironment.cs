@@ -1,4 +1,5 @@
 ﻿using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Abstractions.Interfaces;
@@ -23,7 +24,7 @@ namespace TestData
                 Identity = new TestIdentity { Name = userName, IsAuthenticated = isAuth };
         }
 
-        public Task<IIdentity> GetCurrentUserIdentityAsync()
+        public Task<IIdentity> GetCurrentUserIdentityAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(Identity);
         }

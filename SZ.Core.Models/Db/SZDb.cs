@@ -75,9 +75,10 @@ namespace SZ.Core.Models.Db
             _withoutMigrations = withoutMigrations;
         }
 
-        public async Task<Result> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
+        public async ValueTask<Result> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
         {
             var result = new Result(_logger);
+            var saveCounter = 5;
             try
             {
                 var dbset = Set<T>();
@@ -85,7 +86,6 @@ namespace SZ.Core.Models.Db
                 await dbset.AddAsync(entity, cancellationToken);
 
                 // даётся 5 попыток записать сущность
-                var saveCounter = 5;
                 do
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -112,7 +112,7 @@ namespace SZ.Core.Models.Db
                     }
                     catch (Exception e)
                     {
-                        _logger.LogWarning($"Неудачная попытка записать сущность {typeof(T).Name} c showId {maxId}");
+                        _logger.LogWarning($"Неудачная попытка записать сущность {typeof(T).Name} id={entity.Id} c showId {maxId}");
                     }
                     saveCounter--;
                 } while (saveCounter > 0);
@@ -123,10 +123,10 @@ namespace SZ.Core.Models.Db
             }
             catch (Exception e)
             {
-                return result.AddError(e, "Ошибка добавления");
+                return result.AddError(e, "Ошибка добавления сущности", 1, LogLevel.Error);
             }
 
-            return result.AddError("Не удалось выполнить операцию");
+            return result.AddError($"Не удалось выполнить операцию с сущностью {typeof(T).Name} id={entity.Id} после {saveCounter} попыток");
         }
 
         public struct LengthRequirements

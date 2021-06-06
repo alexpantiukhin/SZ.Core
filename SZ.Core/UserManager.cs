@@ -63,7 +63,7 @@ namespace SZ.Core
                 return result.AddError("Нет права смены пароля", $"Попытка смены пароля пользователю {userId} пользователем {currentUser.Id}, не имеющим на это прав");
 
             var dbUser = await provider.DB
-                .Users.FindAsync(userId, cancellationToken);
+                .Users.FindAsync(new object[] { userId }, cancellationToken);
 
             if (dbUser == null)
                 return result.AddError($"Пользователь {userId} не найден");

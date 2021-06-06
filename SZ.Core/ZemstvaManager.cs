@@ -50,12 +50,17 @@ namespace SZ.Core
         }
 
         #region Crate
-        Task CreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
+        async ValueTask CreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
             CancellationToken cancellationToken = default)
         {
-            return dBProvider.DB.AddEntityAsync(entity, cancellationToken);
+            var createResult = await dBProvider.DB.AddEntityAsync(entity, cancellationToken);
+
+            if (createResult.Success)
+                return;
+
+            result.AddError(createResult.UserMessage, createResult.AdminMessage, 500);
         }
-        Task<Zemstvo> PrepareCreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string name,
+        ValueTask<Zemstvo> PrepareCreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string name,
             CancellationToken cancellationToken)
         {
             var newZemstvo = new Zemstvo
@@ -69,10 +74,10 @@ namespace SZ.Core
                 QuorumVotingTen = 2 / 3
             };
 
-            return Task.FromResult(newZemstvo);
+            return ValueTask.FromResult(newZemstvo);
         }
 
-        async Task ValidCreateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string zemstvoName,
+        async ValueTask ValidCreateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string zemstvoName,
             CancellationToken cancellationToken)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService, cancellationToken);
@@ -92,26 +97,26 @@ namespace SZ.Core
             }
         }
 
-        Task ValidCreateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string name, CancellationToken cancellationToken)
+        ValueTask ValidCreateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(name))
                 result.AddError("Не передано имя земства");
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
         #endregion
 
         #region Update
-        Task<Zemstvo> PrepareUpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+        ValueTask<Zemstvo> PrepareUpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
             CancellationToken cancellationToken)
         {
             dBProvider.DB.Zemstvos.Attach(model);
 
-            return Task.FromResult(model);
+            return ValueTask.FromResult(model);
         }
 
-        async Task ValidUpdateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+        async ValueTask ValidUpdateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
             CancellationToken cancellationToken)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService, cancellationToken);
@@ -133,7 +138,7 @@ namespace SZ.Core
             101, LogLevel.Error);
         }
 
-        async Task ValidUpdateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
+        async ValueTask ValidUpdateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
         {
             await ValidCreateModelAsync(result, dBProvider, model.Name, cancellationToken);
 
@@ -149,25 +154,23 @@ namespace SZ.Core
             else if (model.RequirePaperCircle == 0)
                 result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
         }
-        Task UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
+        ValueTask UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
             CancellationToken cancellationToken = default)
         {
             dBProvider.DB.Zemstvos.Update(entity);
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
         #endregion
 
         #region Delete
-        Task<Zemstvo> PrepareDeleteAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+        async Task<Zemstvo> PrepareDeleteAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Guid model,
             CancellationToken cancellationToken)
         {
-            dBProvider.DB.Zemstvos.Attach(model);
-
-            return Task.FromResult(model);
+            return await dBProvider.DB.Zemstvos.FindAsync(model, cancellationToken);
         }
 
-        async Task ValidDeleteRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+        async ValueTask ValidDeleteRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Guid model,
             CancellationToken cancellationToken)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService, cancellationToken);
@@ -185,11 +188,11 @@ namespace SZ.Core
 
 
             result.AddError("Только админ может создавать земства",
-                $"Попытка редактировать земство {model.Id} пользователем {currentUser.UserName}, не имея на то прав",
+                $"Попытка редактировать земство {model} пользователем {currentUser.UserName}, не имея на то прав",
             101, LogLevel.Error);
         }
 
-        async Task ValidDeleteModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
+        async ValueTask ValidDeleteModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
         {
             await ValidCreateModelAsync(result, dBProvider, model.Name, cancellationToken);
 
@@ -205,16 +208,16 @@ namespace SZ.Core
             else if (model.RequirePaperCircle == 0)
                 result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
         }
-        Task DeleteAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
+        ValueTask DeleteAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
             CancellationToken cancellationToken = default)
         {
             dBProvider.DB.Zemstvos.Update(entity);
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
         #endregion
 
-        public async Task<Result> DeleteAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
+        public async ValueTask<Result> DeleteAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
         {
             Result result = new Result(_logger);
             Zemstvo zemstvo = null;
