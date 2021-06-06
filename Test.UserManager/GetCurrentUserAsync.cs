@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 
 using SZ.Core;
+using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Models;
 
 using TestData;
@@ -13,6 +14,7 @@ namespace SZ.Test.Core
     {
         TestDBFactory factory = new TestDBFactory();
         TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
+        TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment();
         /// <summary>
         /// Объект Identity не определён. Возвращает null
         /// </summary>
@@ -22,7 +24,6 @@ namespace SZ.Test.Core
         {
             //Arrange
             var dbProvider = new DBProvider(factory);
-            var scopeEnvironment = new TestScopeEnvironment();
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -42,11 +43,11 @@ namespace SZ.Test.Core
             //Arrange
             var dbProvider = new DBProvider(factory);
             var user = await dbProvider.DB.AddUser(1);
-            var environment = new TestScopeEnvironment(user);
+            scopeEnvironment.SetTestUser(user);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(dbProvider, environment);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, scopeEnvironment);
 
             //Assert
             Assert.Null(result);
@@ -60,12 +61,12 @@ namespace SZ.Test.Core
         public async Task IdentityNotFoundReturnNull()
         {
             //Arrange
-            var environment = new TestScopeEnvironment("User1", true);
+            scopeEnvironment.SetTestUser("User1", true);
             var dbProvider = new DBProvider(factory);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(dbProvider, environment);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, scopeEnvironment);
 
             //Assert
             Assert.Null(result);
@@ -81,11 +82,11 @@ namespace SZ.Test.Core
             //Arrange
             var dbProvider = new DBProvider(factory);
             var user1 = await dbProvider.DB.AddUser(1);
-            var environment = new TestScopeEnvironment(user1, true);
+            scopeEnvironment.SetTestUser(user1, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
-            var result = await userManager.GetCurrentUserAsync(dbProvider, environment);
+            var result = await userManager.GetCurrentUserAsync(dbProvider, scopeEnvironment);
 
             //Assert
             Assert.True(user1.Id == result.Id, "Если пользователь найден, то должен быть возвращён");

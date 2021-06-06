@@ -1,9 +1,11 @@
-using System;
+using Al;
+
 using System.Threading.Tasks;
 
 using SZ.Core;
+using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Constants;
-using SZ.Core.Models;
+using SZ.Core.Models.Db;
 
 using TestData;
 
@@ -16,21 +18,23 @@ namespace Test.ZemstvaManager
         TestSingletonEnvironment environment = new TestSingletonEnvironment();
         SZ.Core.ZemstvaManager _manager;
         TestDBFactory factory = new TestDBFactory();
+        TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment();
 
         public Create()
         {
-            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null));
+            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null), scopeEnvironment, null);
         }
 
         [Fact]
         public async Task CurrentUserIsAdmin_ResultSuccessWithModel()
         {
             //arrange
-            var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
             var zemstvoName = "новое";
+            scopeEnvironment.SetTestUser(Settings.Users.AdminUserName, true);
 
             //act
-            var result = await _manager.CreateAsync(new DBProvider(factory), scopeEnvironment, zemstvoName);
+            var result = new Result<Zemstvo>();
+            await _manager.Creator.OperationAsync(result, new DBProvider(factory), zemstvoName);
 
             //assert
             Assert.True(result.Success, "При создании админом земства результат должне быть успешным");
@@ -42,29 +46,31 @@ namespace Test.ZemstvaManager
         public async Task CurrentUserIsNotAdmin_ResultNotSuccess()
         {
             //arrange
-            var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, false);
+            scopeEnvironment.SetTestUser(Settings.Users.AdminUserName, false);
             var zemstvoName = "новое";
 
             //act
-            var instance = await _manager.CreateAsync(new DBProvider(factory), scopeEnvironment, zemstvoName);
+            var result = new Result<Zemstvo>();
+            await _manager.Creator.OperationAsync(result, new DBProvider(factory), zemstvoName);
 
             //assert
-            Assert.True(!instance.Success, "При попытке создания земства не админом резульат должне быть с ошибкой");
-            Assert.True(instance.Model == null, "При создании земства не админом возвращаемая модель должна быть null");
+            Assert.True(!result.Success, "При попытке создания земства не админом резульат должне быть с ошибкой");
+            Assert.True(result.Model == null, "При создании земства не админом возвращаемая модель должна быть null");
         }
 
         [Fact]
         public async Task CurrentUserIsAdminNullName_ResultNotSuccess()
         {
             //arrange
-            var scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            scopeEnvironment.SetTestUser(Settings.Users.AdminUserName, true);
             string zemstvoName = null;
 
             //act
-            var instance = await _manager.CreateAsync(new DBProvider(factory), scopeEnvironment, zemstvoName);
+            var result = new Result<Zemstvo>();
+            await _manager.Creator.OperationAsync(result, new DBProvider(factory), zemstvoName);
 
             //assert
-            Assert.True(!instance.Success, "При попытке создания земства, не указав имя должна быть ошибка");
+            Assert.True(!result.Success, "При попытке создания земства, не указав имя должна быть ошибка");
         }
     }
 }

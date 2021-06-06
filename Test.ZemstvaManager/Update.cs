@@ -17,7 +17,8 @@ namespace Test.ZemstvaManager
         TestDBFactory factory = new TestDBFactory();
         public Update()
         {
-            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null));
+            var scopeEnvironment = new TestScopeEnvironment();
+            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null), scopeEnvironment, null);
         }
     }
 }

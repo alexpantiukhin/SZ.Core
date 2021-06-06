@@ -27,7 +27,7 @@ namespace SZ.Core
         }
 
 
-        public async Task<User> GetCurrentUserAsync(DBProvider provider, IUserSessionService userSessionEnvironment)
+        public async Task<User> GetCurrentUserAsync(IDBProvider<SZDb> provider, IUserSessionService userSessionEnvironment)
         {
             var identity = await userSessionEnvironment.GetCurrentUserIdentityAsync();
 
@@ -41,14 +41,14 @@ namespace SZ.Core
             return currentUser;
         }
 
-        public async Task<bool> IsAdminAsync(DBProvider provider, Guid userId)
+        public async Task<bool> IsAdminAsync(IDBProvider<SZDb> provider, Guid userId)
         {
             return await provider.DB.UserRoles
                 .AnyAsync(x => x.UserId == userId
                 && x.RoleId == Settings.Roles.AdminId);
         }
 
-        public async Task<Result<string>> GeneratePasswordAsync(DBProvider provider, IUserSessionService userSessionEnvironment, Guid userId)
+        public async Task<Result<string>> GeneratePasswordAsync(IDBProvider<SZDb> provider, IUserSessionService userSessionEnvironment, Guid userId)
         {
             var result = new Result<string>(_logger);
 

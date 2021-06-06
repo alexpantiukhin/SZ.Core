@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
+using SZ.Core.Abstractions.Interfaces;
 using SZ.Core.Models.Db;
 
-namespace SZ.Core.Models
+namespace SZ.Core.Abstractions.Implementations
 {
-    public class DBProvider : IDisposable, IAsyncDisposable
+    public class DBProvider : IDBProvider<SZDb>
     {
         readonly IDbContextFactory<SZDb> _dbFactory;
         SZDb _db;

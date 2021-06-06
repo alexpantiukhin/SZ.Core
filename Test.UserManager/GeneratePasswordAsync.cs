@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using SZ.Core;
+using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Constants;
 using SZ.Core.Models;
 
@@ -19,6 +20,7 @@ namespace SZ.Test.Core
     {
         TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
         TestDBFactory DBFactory;
+        TestScopeEnvironment environment = new TestScopeEnvironment();
         public GeneratePasswordAsync()
         {
             DBFactory = new TestDBFactory();
@@ -35,7 +37,7 @@ namespace SZ.Test.Core
             var user1 = await dbProvider.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
 
-            var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            environment.SetTestUser(Settings.Users.AdminUserName, true);
 
             var userManager = new UserManager(singltoneEnv, null);
 
@@ -58,7 +60,7 @@ namespace SZ.Test.Core
             var dbProvider = new DBProvider(DBFactory);
             var user1 = await dbProvider.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            var environment = new TestScopeEnvironment(user1.UserName, true);
+            environment.SetTestUser(user1.UserName, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -79,7 +81,7 @@ namespace SZ.Test.Core
             var dbProvider = new DBProvider(DBFactory);
             var user1 = await dbProvider.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            var environment = new TestScopeEnvironment(user1.UserName, false);
+            environment.SetTestUser(user1.UserName, false);
 
             var userManager = new UserManager(singltoneEnv, null);
 
@@ -102,7 +104,7 @@ namespace SZ.Test.Core
         {
             //Arrange
             var dbProvider = new DBProvider(DBFactory);
-            var environment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            environment.SetTestUser(Settings.Users.AdminUserName, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act

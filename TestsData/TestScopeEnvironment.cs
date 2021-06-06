@@ -9,24 +9,23 @@ namespace TestData
     public class TestScopeEnvironment : IUserSessionService
     {
         IIdentity Identity;
-        /// <summary>
-        /// Пользователь не зашёл
-        /// </summary>
-        public TestScopeEnvironment() : this(default(string), false) { }
 
-        public TestScopeEnvironment(User user, bool isAuth = false) : this(user.UserName, isAuth) { }
-
-        public TestScopeEnvironment(string userName = null, bool isAuth = false)
+        public void SetTestUser(User user, bool isAuth = false)
         {
-            if (string.IsNullOrWhiteSpace(userName))
-                return;
-
-            Identity = new TestIdentity { Name = userName, IsAuthenticated = isAuth };
+            SetTestUser(user.UserName, isAuth);
         }
 
-        public async Task<IIdentity> GetCurrentUserIdentityAsync()
+        public void SetTestUser(string userName = null, bool isAuth = false)
         {
-            return Identity;
+            if (string.IsNullOrWhiteSpace(userName))
+                Identity = null;
+            else
+                Identity = new TestIdentity { Name = userName, IsAuthenticated = isAuth };
+        }
+
+        public Task<IIdentity> GetCurrentUserIdentityAsync()
+        {
+            return Task.FromResult(Identity);
         }
     }
 }

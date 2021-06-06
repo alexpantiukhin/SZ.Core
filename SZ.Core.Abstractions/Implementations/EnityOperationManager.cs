@@ -1,30 +1,30 @@
 ﻿using Al;
 
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Abstractions.Interfaces;
-using SZ.Core.Models;
-using SZ.Core.Models.Interfaces;
 
-namespace SZ.Core
+namespace SZ.Core.Abstractions.Implementations
 {
-    public class CRUDManager<T, TModel, TResult> : ICRUDManager<T, TModel, TResult>
-        where T : class, IDBEntity
+    public class EnityOperationManager<T, TModel, TResult, TDB> : IEntityOperationManager<T, TModel, TResult, TDB>
+        where T : class
         where TResult : Result
+        where TDB : DbContext
     {
-        public ICRUDManager<T, TModel, TResult>.CRUDEventHandler ValidModel { get; }
-        public ICRUDManager<T, TModel, TResult>.CRUDEventHandler ValidRight { get; }
-        public ICRUDManager<T, TModel, TResult>.CRUDEventGenericHandler Prepare { get; }
-        public ICRUDManager<T, TModel, TResult>.CRUDEventHandler Post { get; }
-        public ICRUDManager<T, TModel, TResult>.CRUDDBActionHandler DBAction { get; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.EventHandler ValidModel { get; init; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.EventHandler ValidRight { get; init; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.EventGenericHandler Prepare { get; init; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.EventHandler Post { get; init; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.DBActionHandler DBAction { get; init; }
 
         public async Task OperationAsync(
             [NotNull] TResult result,
-            [NotNull] DBProvider provider,
-            [NotNull] IUserSessionService userSessionService,
+            [NotNull] IDBProvider<TDB> provider,
             [NotNull] TModel model,
             CancellationToken cancellationToken = default)
         {
@@ -37,18 +37,18 @@ namespace SZ.Core
                 }
 
                 if (ValidRight != null)
-                    await ValidRight(result, provider, model, userSessionService, cancellationToken);
+                    await ValidRight(result, provider, model, cancellationToken);
 
                 if (!result.Success)
                     return;
 
                 if (ValidModel != null)
-                    await ValidModel(result, provider, model, userSessionService, cancellationToken);
+                    await ValidModel(result, provider, model, cancellationToken);
 
                 if (!result.Success)
                     return;
 
-                var entity = await Prepare(result, provider, model, userSessionService, cancellationToken);
+                var entity = await Prepare(result, provider, model, cancellationToken);
 
                 if (!result.Success)
                     return;
@@ -60,13 +60,13 @@ namespace SZ.Core
                     return;
                 }
 
-                await DBAction(result, provider, entity, userSessionService, cancellationToken);
+                await DBAction(result, provider, entity, cancellationToken);
 
                 if (!result.Success)
                     return;
 
                 if (Post != null)
-                    await Post(result, provider, model, userSessionService, cancellationToken);
+                    await Post(result, provider, model, cancellationToken);
 
                 if (!result.Success)
                     return;

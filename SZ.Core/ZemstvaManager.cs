@@ -9,26 +9,55 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Abstractions.Interfaces;
-using SZ.Core.Models;
 using SZ.Core.Models.Db;
 
 namespace SZ.Core
 {
     public class ZemstvaManager : IZemstvaManager
     {
-        ICRUDManager<Zemstvo, string, Zemstvo, Guid> _CRUDManager;
         readonly IUserManager _userManager;
         readonly ILogger _logger;
-        public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory = null)
+        readonly IUserSessionService _userSessionService;
+
+        public IEntityOperationManager<Zemstvo, string, Result<Zemstvo>, SZDb> Creator { get; }
+        public IEntityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb> Updater { get; }
+        public IEntityOperationManager<Zemstvo, Zemstvo, Result, SZDb> Deleter { get; }
+
+        public ZemstvaManager(IUserManager userManager, IUserSessionService userSessionService, ILoggerFactory loggerFactory)
         {
-            _CRUDManager = new CRUDManager<Zemstvo, string, Zemstvo, Guid>(loggerFactory);
-            _userManager = userManager;
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
+            _userSessionService = userSessionService;
+
+            Creator = new EnityOperationManager<Zemstvo, string, Result<Zemstvo>, SZDb>
+            {
+                Prepare = PrepareCreateAsync,
+                ValidModel = ValidCreateModelAsync,
+                ValidRight = ValidCreateRightAsync,
+                DBAction = CreateAsync
+            };
+
+            Updater = new EnityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb>
+            {
+                Prepare = PrepareUpdateAsync,
+                ValidModel = ValidUpdateModelAsync,
+                ValidRight = ValidUpdateRightAsync,
+                DBAction = UpdateAsync
+            };
+            Deleter = new EnityOperationManager<Zemstvo, Zemstvo, Result, SZDb>();
+
+            _userManager = userManager;
         }
 
-        Task<Zemstvo> PrepareCreate(Result<Zemstvo> result, DBProvider dBProvider, string name,
-            IUserSessionService userSessionService, CancellationToken cancellationToken)
+        #region Crate
+        Task CreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
+            CancellationToken cancellationToken = default)
+        {
+            return dBProvider.DB.AddEntityAsync(entity, cancellationToken);
+        }
+        Task<Zemstvo> PrepareCreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string name,
+            CancellationToken cancellationToken)
         {
             var newZemstvo = new Zemstvo
             {
@@ -44,19 +73,25 @@ namespace SZ.Core
             return Task.FromResult(newZemstvo);
         }
 
-        public async Task ValidCreateRight(Result<Zemstvo> result, DBProvider dBProvider, string zemstvoName,
-            IUserSessionService userSessionService, CancellationToken cancellationToken)
+        async Task ValidCreateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string zemstvoName,
+            CancellationToken cancellationToken)
         {
-            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, userSessionService);
+            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService);
 
             if (currentUser == null)
+            {
                 result.AddError("Текущий пользователь не определён");
+                return;
+            }
 
             if (!await _userManager.IsAdminAsync(dBProvider, currentUser.Id))
+            {
                 result.AddError("Только админ может создавать земства");
+                return;
+            }
         }
 
-        Task ValidCreateModel(Result<Zemstvo> result, DBProvider dBProvider, string name, CancellationToken cancellationToken)
+        Task ValidCreateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(name))
                 result.AddError("Не передано имя земства");
@@ -64,40 +99,62 @@ namespace SZ.Core
             return Task.CompletedTask;
         }
 
-        public async Task<Result<Zemstvo>> CreateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
-            [NotNull] string zemstvoName, CancellationToken cancellationToken = default)
+        #endregion
+
+        #region Update
+        Task<Zemstvo> PrepareUpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+            CancellationToken cancellationToken)
         {
-            return await _CRUDManager.CreateAsync(this, provider, userSessionService, zemstvoName, cancellationToken);
+            dBProvider.DB.Zemstvos.Attach(model);
+
+            return Task.FromResult(model);
         }
 
-        public async Task<Result<Zemstvo>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Zemstvo model)
+        async Task ValidUpdateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+            CancellationToken cancellationToken)
         {
-            Result<Zemstvo> result = new Result<Zemstvo>(_logger);
-            try
+            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService);
+
+            if (currentUser == null)
             {
-                var zemstvo = await provider.DB.Zemstvos.FindAsync(model.Id);
-
-                if (zemstvo == null)
-                    return result.AddError($"Земства с id {model.ShowId} не существует");
-
-                zemstvo.Name = model.Name;
-                zemstvo.QuorumVotingTen = model.QuorumVotingTen;
-                zemstvo.RequirePaperCircle = model.RequirePaperCircle;
-                zemstvo.AutoConfirmProtocolCircle = model.AutoConfirmProtocolCircle;
-                zemstvo.QuorumMeetingTen = model.QuorumMeetingTen;
-                zemstvo.QuorumTensForQuestion = model.QuorumTensForQuestion;
-
-                var saveResult = await provider.DB.SaveChangesAsync();
-
-                return result.AddModel(zemstvo, "Изменения земства сохранены");
+                result.AddError("Текущий пользователь не определён", null, 100);
+                return;
             }
-            catch (Exception e)
-            {
-                return result.AddError(e, "Ошибка изменения земства");
-            }
+
+            if (await _userManager.IsAdminAsync(dBProvider, currentUser.Id))
+                return;
+
+
+            result.AddError("Нет права редактировать данные земства",
+                $"Попытка редактировать земство {model.Id} пользователем {currentUser.UserName}, не имея на то прав",
+                101, LogLevel.Error);
         }
 
-        public async Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
+        Task ValidUpdateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(model.Name))
+                result.AddError("Не указано имя земства", null, 200);
+            else if (model.QuorumVotingTen <= 0)
+                result.AddError("Кворум голосов в десятке указан неверно", null, 201);
+            else if (model.QuorumMeetingTen <= 0)
+                result.AddError("Кворум присутствующих в десятке указан неверно", null, 202);
+            else if (model.QuorumTensForQuestion <= 0)
+                result.AddError("Неверно указана доля поддесяток, которые должны принять решение по вопросу, прежде, чем он поступит на обсуждение в следующий круг", null, 200);
+            else if (model.RequirePaperCircle == 0)
+                result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
+
+            return Task.CompletedTask;
+        }
+        Task UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
+            CancellationToken cancellationToken = default)
+        {
+            dBProvider.DB.Zemstvos.Update(entity);
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        public async Task<Result> DeleteAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
         {
             Result result = new Result(_logger);
             Zemstvo zemstvo = null;
@@ -129,7 +186,7 @@ namespace SZ.Core
             return provider.DB.Zemstvos.FirstOrDefaultAsync(x => x.ShowId == showId);
         }
 
-        public async Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService)
+        public async Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
 
@@ -143,7 +200,7 @@ namespace SZ.Core
                 .Select(x => x.Ten.Zemstvo).Distinct();
         }
 
-        public async Task<IQueryable<Zemstvo>> GetAllZemstvaAsync([NotNull] DBProvider provider, IUserSessionService userSessionService)
+        public async Task<IQueryable<Zemstvo>> GetAllZemstvaAsync([NotNull] IDBProvider<SZDb> provider, IUserSessionService userSessionService)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(provider, userSessionService);
 
