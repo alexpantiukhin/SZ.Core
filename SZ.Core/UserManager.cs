@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 
 using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Abstractions.Interfaces;
 using SZ.Core.Constants;
-using SZ.Core.Models;
 using SZ.Core.Models.Db;
 
 namespace SZ.Core
@@ -27,43 +27,43 @@ namespace SZ.Core
         }
 
 
-        public async Task<User> GetCurrentUserAsync(IDBProvider<SZDb> provider, IUserSessionService userSessionEnvironment)
+        public async Task<User> GetCurrentUserAsync(IDBProvider<SZDb> provider, IUserSessionService userSessionEnvironment, CancellationToken cancellationToken = default)
         {
-            var identity = await userSessionEnvironment.GetCurrentUserIdentityAsync();
+            var identity = await userSessionEnvironment.GetCurrentUserIdentityAsync(cancellationToken);
 
             if (identity?.IsAuthenticated != true)
                 return null;
 
             var currentUser = await provider.DB
                 .Users
-                .FirstOrDefaultAsync(x => x.UserName == identity.Name);
+                .FirstOrDefaultAsync(x => x.UserName == identity.Name, cancellationToken);
 
             return currentUser;
         }
 
-        public async Task<bool> IsAdminAsync(IDBProvider<SZDb> provider, Guid userId)
+        public async Task<bool> IsAdminAsync(IDBProvider<SZDb> provider, Guid userId, CancellationToken cancellationToken = default)
         {
             return await provider.DB.UserRoles
                 .AnyAsync(x => x.UserId == userId
-                && x.RoleId == Settings.Roles.AdminId);
+                && x.RoleId == Settings.Roles.AdminId, cancellationToken);
         }
 
-        public async Task<Result<string>> GeneratePasswordAsync(IDBProvider<SZDb> provider, IUserSessionService userSessionEnvironment, Guid userId)
+        public async Task<Result<string>> GeneratePasswordAsync(IDBProvider<SZDb> provider, IUserSessionService userSessionEnvironment, Guid userId, CancellationToken cancellationToken = default)
         {
             var result = new Result<string>(_logger);
 
-            var currentUser = await GetCurrentUserAsync(provider, userSessionEnvironment);
+            var currentUser = await GetCurrentUserAsync(provider, userSessionEnvironment, cancellationToken);
 
             if (currentUser == null)
                 return result.AddError("Войдите в систему", $"Попытка смены пароля пользователю {userId} неавторизованным пользователем");
 
-            var isAdmin = await IsAdminAsync(provider, currentUser.Id);
+            var isAdmin = await IsAdminAsync(provider, currentUser.Id, cancellationToken);
 
             if (!isAdmin && currentUser.Id != userId)
                 return result.AddError("Нет права смены пароля", $"Попытка смены пароля пользователю {userId} пользователем {currentUser.Id}, не имеющим на это прав");
 
             var dbUser = await provider.DB
-                .Users.FindAsync(userId);
+                .Users.FindAsync(userId, cancellationToken);
 
             if (dbUser == null)
                 return result.AddError($"Пользователь {userId} не найден");
@@ -74,7 +74,7 @@ namespace SZ.Core
 
             try
             {
-                var a = await provider.DB.SaveChangesAsync();
+                var a = await provider.DB.SaveChangesAsync(cancellationToken);
 
                 if (a == 0)
                 {

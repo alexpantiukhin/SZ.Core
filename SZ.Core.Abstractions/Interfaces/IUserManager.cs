@@ -2,9 +2,9 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 
-using SZ.Core.Models;
 using SZ.Core.Models.Db;
 
 namespace SZ.Core.Abstractions.Interfaces
@@ -17,14 +17,14 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="provider">провайдер БД</param>
         /// <param name="userSessionService">окружение, содержащее текущий Identity</param>
         /// <returns></returns>
-        Task<User> GetCurrentUserAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService);
+        Task<User> GetCurrentUserAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, CancellationToken cancellationToken = default);
         /// <summary>
         /// Проверяет, является ли пользователь админом системы
         /// </summary>
         /// <param name="provider">Провайдер бд</param>
         /// <param name="userId">Id проверяемого пользователя</param>
         /// <returns></returns>
-        Task<bool> IsAdminAsync([NotNull] IDBProvider<SZDb> provider, Guid userId);
+        Task<bool> IsAdminAsync([NotNull] IDBProvider<SZDb> provider, Guid userId, CancellationToken cancellationToken = default);
         /// <summary>
         /// Генерирует новый пароль пользователю
         /// </summary>
@@ -32,6 +32,6 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="userSessionService">Окружение с текущим пользователем</param>
         /// <param name="userId">Id пользователя, которому генерируется новый пароль</param>
         /// <returns>Новый пароль</returns>
-        Task<Result<string>> GeneratePasswordAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, Guid userId);
+        Task<Result<string>> GeneratePasswordAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, Guid userId, CancellationToken cancellationToken = default);
     }
 }

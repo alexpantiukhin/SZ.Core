@@ -75,7 +75,7 @@ namespace SZ.Core
         async Task ValidCreateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, string zemstvoName,
             CancellationToken cancellationToken)
         {
-            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService);
+            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService, cancellationToken);
 
             if (currentUser == null)
             {
@@ -83,10 +83,10 @@ namespace SZ.Core
                 return;
             }
 
-            if (!await _userManager.IsAdminAsync(dBProvider, currentUser.Id))
+            if (!await _userManager.IsAdminAsync(dBProvider, currentUser.Id, cancellationToken))
             {
                 result.AddError("Только админ может создавать земства",
-                    $"Попытка создать или редактировать земство {zemstvoName} пользователем {currentUser.UserName}, не имея на то прав",
+                    $"Попытка создать земство {zemstvoName} пользователем {currentUser.UserName}, не имея на то прав",
                 101, LogLevel.Error);
                 return;
             }
@@ -114,10 +114,23 @@ namespace SZ.Core
         async Task ValidUpdateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
             CancellationToken cancellationToken)
         {
-            await ValidCreateRightAsync(result, dBProvider, model.Id.ToString(), cancellationToken);
+            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService, cancellationToken);
 
-            if (!result.Success)
+            if (currentUser == null)
+            {
+                result.AddError("Текущий пользователь не определён", null, 100);
                 return;
+            }
+
+            if (await _userManager.IsAdminAsync(dBProvider, currentUser.Id, cancellationToken))
+                return;
+
+            //TODO проверка на роль главы земства
+
+
+            result.AddError("Только админ может создавать земства",
+                $"Попытка редактировать земство {model.Id} пользователем {currentUser.UserName}, не имея на то прав",
+            101, LogLevel.Error);
         }
 
         async Task ValidUpdateModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
@@ -137,6 +150,62 @@ namespace SZ.Core
                 result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
         }
         Task UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
+            CancellationToken cancellationToken = default)
+        {
+            dBProvider.DB.Zemstvos.Update(entity);
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region Delete
+        Task<Zemstvo> PrepareDeleteAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+            CancellationToken cancellationToken)
+        {
+            dBProvider.DB.Zemstvos.Attach(model);
+
+            return Task.FromResult(model);
+        }
+
+        async Task ValidDeleteRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model,
+            CancellationToken cancellationToken)
+        {
+            var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, _userSessionService, cancellationToken);
+
+            if (currentUser == null)
+            {
+                result.AddError("Текущий пользователь не определён", null, 100);
+                return;
+            }
+
+            if (await _userManager.IsAdminAsync(dBProvider, currentUser.Id, cancellationToken))
+                return;
+
+            //TODO проверка на роль главы земства
+
+
+            result.AddError("Только админ может создавать земства",
+                $"Попытка редактировать земство {model.Id} пользователем {currentUser.UserName}, не имея на то прав",
+            101, LogLevel.Error);
+        }
+
+        async Task ValidDeleteModelAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo model, CancellationToken cancellationToken)
+        {
+            await ValidCreateModelAsync(result, dBProvider, model.Name, cancellationToken);
+
+            if (!result.Success)
+                return;
+
+            if (model.QuorumVotingTen <= 0)
+                result.AddError("Кворум голосов в десятке указан неверно", null, 201);
+            else if (model.QuorumMeetingTen <= 0)
+                result.AddError("Кворум присутствующих в десятке указан неверно", null, 202);
+            else if (model.QuorumTensForQuestion <= 0)
+                result.AddError("Неверно указана доля поддесяток, которые должны принять решение по вопросу, прежде, чем он поступит на обсуждение в следующий круг", null, 200);
+            else if (model.RequirePaperCircle == 0)
+                result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
+        }
+        Task DeleteAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider, Zemstvo entity,
             CancellationToken cancellationToken = default)
         {
             dBProvider.DB.Zemstvos.Update(entity);
