@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace SZ.Core.Abstractions.Interfaces
     public interface IZemstvaManager :
         IEntityManagerCreator<Zemstvo, string, SZDb>,
         IEntityManagerUpdater<Zemstvo, Zemstvo, SZDb>,
-        IEntityManagerDeleter<Zemstvo, Zemstvo, SZDb>
+        IEntityManagerDeleter<Zemstvo, Guid, SZDb>
     {
         /// <summary>
         /// Возвращает земства, в которых в данный момент состоит пользователь

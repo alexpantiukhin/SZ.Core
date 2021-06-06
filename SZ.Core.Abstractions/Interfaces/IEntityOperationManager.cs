@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace SZ.Core.Abstractions.Interfaces
 {
+    /// <summary>
+    /// Менеджер одной из crud операций
+    /// </summary>
+    /// <typeparam name="T">Тип сущности</typeparam>
+    /// <typeparam name="TModel">Модель операции с сущностью</typeparam>
+    /// <typeparam name="TResult">Модель результата</typeparam>
+    /// <typeparam name="TDB">Контекст базы данных</typeparam>
     public interface IEntityOperationManager<T, TModel, TResult, TDB>
         where T : class
         where TResult : Result

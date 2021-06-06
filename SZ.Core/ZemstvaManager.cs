@@ -23,7 +23,7 @@ namespace SZ.Core
 
         public IEntityOperationManager<Zemstvo, string, Result<Zemstvo>, SZDb> Creator { get; }
         public IEntityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb> Updater { get; }
-        public IEntityOperationManager<Zemstvo, Zemstvo, Result, SZDb> Deleter { get; }
+        public IEntityOperationManager<Zemstvo, Guid, Result, SZDb> Deleter { get; }
 
         public ZemstvaManager(IUserManager userManager, IUserSessionService userSessionService, ILoggerFactory loggerFactory)
         {
@@ -45,7 +45,10 @@ namespace SZ.Core
                 ValidRight = ValidUpdateRightAsync,
                 DBAction = UpdateAsync
             };
-            Deleter = new EnityOperationManager<Zemstvo, Zemstvo, Result, SZDb>();
+            Deleter = new EnityOperationManager<Zemstvo, Guid, Result, SZDb>
+            {
+
+            };
 
             _userManager = userManager;
         }
