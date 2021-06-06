@@ -60,7 +60,7 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <summary>
         /// Подготовливает сущность из моедли для операции с сущностью. Коды ошибок 300-399
         /// </summary>
-        EventGenericHandler Prepare { get; init; }
+        EventGenericHandler Prepare { get; }
         /// <summary>
         /// Действие после операции с сущностью. Коды ошибок 400-499
         /// </summary>
@@ -68,7 +68,7 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <summary>
         /// Операция с баздой данный для сущности. Коды ошибок 500-599
         /// </summary>
-        public DBActionHandler DBAction { get; init; }
+        public DBActionHandler DBAction { get; }
 
         /// <summary>
         /// Операция с сущностью

@@ -11,16 +11,23 @@ using SZ.Core.Abstractions.Interfaces;
 
 namespace SZ.Core.Abstractions.Implementations
 {
-    public class EnityOperationManager<T, TModel, TResult, TDB> : IEntityOperationManager<T, TModel, TResult, TDB>
+    public class EntityOperationManager<T, TModel, TResult, TDB> : IEntityOperationManager<T, TModel, TResult, TDB>
         where T : class
         where TResult : Result
         where TDB : DbContext
     {
         public IEntityOperationManager<T, TModel, TResult, TDB>.EventHandler ValidModel { get; init; }
         public IEntityOperationManager<T, TModel, TResult, TDB>.EventHandler ValidRight { get; init; }
-        public IEntityOperationManager<T, TModel, TResult, TDB>.EventGenericHandler Prepare { get; init; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.EventGenericHandler Prepare { get; }
         public IEntityOperationManager<T, TModel, TResult, TDB>.EventHandler Post { get; init; }
-        public IEntityOperationManager<T, TModel, TResult, TDB>.DBActionHandler DBAction { get; init; }
+        public IEntityOperationManager<T, TModel, TResult, TDB>.DBActionHandler DBAction { get; }
+
+        public EntityOperationManager(IEntityOperationManager<T, TModel, TResult, TDB>.EventGenericHandler prepare,
+            IEntityOperationManager<T, TModel, TResult, TDB>.DBActionHandler dbAction)
+        {
+            Prepare = prepare;
+            DBAction = dbAction;
+        }
 
         public async Task OperationAsync(
             [NotNull] TResult result,
