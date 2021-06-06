@@ -1,7 +1,5 @@
 ﻿using Al;
 
-using Microsoft.Extensions.Logging;
-
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -13,118 +11,78 @@ using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core
 {
-    public class CRUDManager<T, TCreate, TUpdate, TDelete> : ICRUDManager<T, TCreate, TUpdate, TDelete>
+    public class CRUDManager<T, TModel, TResult> : ICRUDManager<T, TModel, TResult>
         where T : class, IDBEntity
+        where TResult : Result
     {
-        readonly ILogger _logger;
-        public CRUDManager(ILoggerFactory loggerFactory)
+        public ICRUDManager<T, TModel, TResult>.CRUDEventHandler ValidModel { get; }
+        public ICRUDManager<T, TModel, TResult>.CRUDEventHandler ValidRight { get; }
+        public ICRUDManager<T, TModel, TResult>.CRUDEventGenericHandler Prepare { get; }
+        public ICRUDManager<T, TModel, TResult>.CRUDEventHandler Post { get; }
+        public ICRUDManager<T, TModel, TResult>.CRUDDBActionHandler DBAction { get; }
+
+        public async Task OperationAsync(
+            [NotNull] TResult result,
+            [NotNull] DBProvider provider,
+            [NotNull] IUserSessionService userSessionService,
+            [NotNull] TModel model,
+            CancellationToken cancellationToken = default)
         {
-            _logger = loggerFactory?.CreateLogger(GetType());
-        }
-        //public Func<Result<T>, DBProvider, TCreate, CancellationToken, Task> ValidCreateModel { get; init; }
-        public Func<Result<T>, DBProvider, TUpdate, CancellationToken, Task> ValidUpdateModel { get; init; }
-        public Func<Result<T>, DBProvider, TDelete, CancellationToken, Task> ValidDeleteModel { get; init; }
-
-        ///// <summary>
-        ///// Валидация права создания сущности. Коды ошибок от 100-199
-        ///// </summary>
-        //public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> ValidCreateRight { get; init; }
-        /// <summary>
-        /// Валидация права изменения сущности. Коды ошибок от 100-199
-        /// </summary>
-        public Func<Result<T>, DBProvider, TUpdate, IUserSessionService, CancellationToken, Task> ValidUpdateRight { get; init; }
-        /// <summary>
-        /// Валидация права удаления сущности. Коды ошибок от 100-199
-        /// </summary>
-        public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task> ValidDeleteRight { get; init; }
-        ///// <summary>
-        ///// Операция подготовки создания сущности. Коды ошибок 400-499
-        ///// </summary>
-        //public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task<T>> PrepareCreate { get; init; }
-        ///// <summary>
-        ///// Операция подготовки создания сущности. Коды ошибок 400-499
-        ///// </summary>
-        //public Func<Result<T>, DBProvider, TCreate, IUserSessionService, CancellationToken, Task> PostCreate { get; init; }
-        /// <summary>
-        /// Операция подготовки изменения сущности. Коды ошибок 400-499
-        /// </summary>
-        public Func<Result<T>, DBProvider, TUpdate, IUserSessionService, CancellationToken, Task<T>> PrepareUpdate { get; init; }
-        /// <summary>
-        /// Операция подготовки изменения сущности. Коды ошибок 400-499
-        /// </summary>
-        public Func<Result<T>, DBProvider, TUpdate, IUserSessionService, CancellationToken, Task> PostUpdate { get; init; }
-        /// <summary>
-        /// Операция подготовки удаления сущности. Коды ошибок 400-499
-        /// </summary>
-        public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task<T>> PrepareDelete { get; init; }
-        /// <summary>
-        /// Операция подготовки удаления сущности. Коды ошибок 400-499
-        /// </summary>
-        public Func<Result<T>, DBProvider, TDelete, IUserSessionService, CancellationToken, Task> PostDelete { get; init; }
-
-
-
-        public async Task<Result<T>> CreateAsync([NotNull] ICreateEntityManager<T, TCreate> entityCreator, [NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
-            [NotNull] TCreate model, CancellationToken cancellationToken = default)
-        {
-            var result = new Result<T>(_logger);
-
             try
             {
-                if (entityCreator == null)
-                    return result.AddError("Ошибка создания записи", "Не передан создатель сущностей", 1);
+                if (Prepare == null || DBAction == null)
+                {
+                    result.AddError("Ошибка создания записи", "Не передан метод подготовки сущности или метод запроса к БД", 1);
+                    return;
+                }
 
-                await entityCreator.ValidCreateRight(result, provider, model, userSessionService, cancellationToken);
-
-                if (!result.Success)
-                    return result;
-
-                await entityCreator.ValidCreateModel(result, provider, model, cancellationToken);
-
-                if (!result.Success)
-                    return result;
-
-                var entity = await entityCreator.PrepareCreate(result, provider, model, userSessionService, cancellationToken);
+                if (ValidRight != null)
+                    await ValidRight(result, provider, model, userSessionService, cancellationToken);
 
                 if (!result.Success)
-                    return result;
+                    return;
+
+                if (ValidModel != null)
+                    await ValidModel(result, provider, model, userSessionService, cancellationToken);
+
+                if (!result.Success)
+                    return;
+
+                var entity = await Prepare(result, provider, model, userSessionService, cancellationToken);
+
+                if (!result.Success)
+                    return;
 
                 if (entity == null)
-                    return result.AddError("Ошибка создания. Попробуйте снова или обратитесь к администратору", "Метод создания отработал успешно, но сущность null", 2);
+                {
+                    result.AddError("Ошибка операции с сущностью. Попробуйте снова или обратитесь к администратору",
+                        "Метод подготовки сущность отработал успешно, но сущность null", 2);
+                    return;
+                }
 
-                var addedResult = await provider.DB.AddEntityAsync(entity, cancellationToken);
-
-                if (!addedResult.Success)
-                    return result;
-
-                await entityCreator.PostCreate(result, provider, model, userSessionService, cancellationToken);
+                await DBAction(result, provider, entity, userSessionService, cancellationToken);
 
                 if (!result.Success)
-                    return result;
+                    return;
 
-                return result.AddModel(entity, "Запись создана");
+                if (Post != null)
+                    await Post(result, provider, model, userSessionService, cancellationToken);
+
+                if (!result.Success)
+                    return;
+
+                if (result is Result<T> tResult)
+                    tResult.AddModel(entity, "Операция с сущностью успешна");
 
             }
             catch (TaskCanceledException e)
             {
-                return result.AddError(e, "Операция отменена", 3);
+                result.AddError(e, "Операция отменена", 3);
             }
             catch (Exception e)
             {
-                return result.AddError(e, "Ошибка создания. Попробуйте снова", 4);
+                result.AddError(e, "Ошибка операции с сущностью. Попробуйте снова", 4);
             }
-        }
-
-        public Task<Result> DeleteAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
-            [NotNull] TDelete model, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<T>> UpdateAsync([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService,
-            [NotNull] TUpdate model, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
         }
     }
 }
