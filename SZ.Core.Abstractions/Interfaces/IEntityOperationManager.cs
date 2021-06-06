@@ -27,7 +27,8 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="dBProvider">Провайдер БД</param>
         /// <param name="model">Модель операции с сущностью</param>
         /// <param name="cancellationToken">Токен отмены асинхронной операции</param>
-        public delegate ValueTask EventHandler(TResult result, IDBProvider<TDB> dBProvider, TModel model,
+        public delegate ValueTask EventHandler(TResult result, IDBProvider<TDB> dBProvider,
+            IUserSessionService userSessionService, TModel model,
             CancellationToken cancellationToken = default);
         /// <summary>
         /// Одно из действий операции с сущностью с типизированным результатом
@@ -37,7 +38,8 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="model">Модель операции с сущностью</param>
         /// <param name="cancellationToken">Токен отмены асинхронной операции</param>
         /// <returns>Сущность</returns>
-        public delegate ValueTask<T> EventGenericHandler(TResult result, IDBProvider<TDB> dBProvider, TModel model,
+        public delegate ValueTask<T> EventGenericHandler(TResult result, IDBProvider<TDB> dBProvider,
+            IUserSessionService userSessionService, TModel model,
             CancellationToken cancellationToken = default);
         /// <summary>
         /// Операция с базой данных для сущности
@@ -46,7 +48,8 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="dBProvider">Провайдер БД</param>
         /// <param name="model">Модель операции с сущностью</param>
         /// <param name="cancellationToken">Токен отмены асинхронной операции</param>
-        public delegate ValueTask DBActionHandler(TResult result, IDBProvider<TDB> dBProvider, T entity,
+        public delegate ValueTask DBActionHandler(TResult result, IDBProvider<TDB> dBProvider,
+            IUserSessionService userSessionService, T entity,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -77,7 +80,8 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <param name="dBProvider">Провайдер БД</param>
         /// <param name="model">Модель операции с сущностью</param>
         /// <param name="cancellationToken">Токен отмены асинхронной операции</param>
-        Task OperationAsync([NotNull] TResult result, [NotNull] IDBProvider<TDB> provider,
+        ValueTask<TResult> OperationAsync([NotNull] IDBProvider<TDB> provider,
+            [NotNull] IUserSessionService userSessionService,
             [NotNull] TModel model, CancellationToken cancellationToken = default);
     }
 }
