@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestData", "TestsData\TestD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.UserManager", "Test.UserManager\Test.UserManager.csproj", "{2F5B412F-1AA6-44E7-9502-9DA78977B05B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.ZemstvaManager", "Test.ZemstvaManager\Test.ZemstvaManager.csproj", "{C7CEB01F-588A-48D3-AD85-0203E68278CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.ZemstvaManager", "Test.ZemstvaManager\Test.ZemstvaManager.csproj", "{C7CEB01F-588A-48D3-AD85-0203E68278CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
