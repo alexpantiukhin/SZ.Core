@@ -171,7 +171,7 @@ namespace SZ.Core
             else if (model.RequirePaperCircle == 0)
                 result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
         }
-        ValueTask UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
+        async ValueTask UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
             IUserSessionService userSessionService, Zemstvo entity,
             CancellationToken cancellationToken = default)
         {

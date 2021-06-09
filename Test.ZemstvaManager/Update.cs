@@ -18,7 +18,7 @@ namespace Test.ZemstvaManager
         public Update()
         {
             var scopeEnvironment = new TestScopeEnvironment();
-            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null), scopeEnvironment, null);
+            _manager = new SZ.Core.ZemstvaManager(new UserManager(environment, null), null);
         }
     }
 }

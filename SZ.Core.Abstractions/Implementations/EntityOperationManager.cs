@@ -33,7 +33,7 @@ namespace SZ.Core.Abstractions.Implementations
             Prepare = prepare;
             DBAction = dbAction;
             _resultMaker = resultMaker;
-            _logger = loggerFactory.CreateLogger<EntityOperationManager<T, TModel, TResult, TDB>>();
+            _logger = loggerFactory?.CreateLogger<EntityOperationManager<T, TModel, TResult, TDB>>();
         }
 
         public async ValueTask<TResult> OperationAsync(

@@ -43,7 +43,7 @@ namespace SZ.Test.Core
             //Arrange
             var dbProvider = new DBProvider(factory);
             var user = await dbProvider.DB.AddUser(1);
-            scopeEnvironment.SetTestUser(user);
+            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(user);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -61,7 +61,7 @@ namespace SZ.Test.Core
         public async Task IdentityNotFoundReturnNull()
         {
             //Arrange
-            scopeEnvironment.SetTestUser("User1", true);
+            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment("User1", true);
             var dbProvider = new DBProvider(factory);
             var userManager = new UserManager(singltoneEnv, null);
 
@@ -82,7 +82,7 @@ namespace SZ.Test.Core
             //Arrange
             var dbProvider = new DBProvider(factory);
             var user1 = await dbProvider.DB.AddUser(1);
-            scopeEnvironment.SetTestUser(user1, true);
+            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(user1, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
