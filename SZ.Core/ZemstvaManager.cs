@@ -28,19 +28,31 @@ namespace SZ.Core
         {
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
 
-            Creator = new EntityOperationManager<Zemstvo, string, Result<Zemstvo>, SZDb>(PrepareCreateAsync, CreateAsync)
+            Creator = new EntityOperationManager<Zemstvo, string, Result<Zemstvo>, SZDb>(
+                PrepareCreateAsync,
+                CreateAsync,
+                x => new Result<Zemstvo>(x),
+                loggerFactory)
             {
                 ValidModel = ValidCreateModelAsync,
                 ValidRight = ValidCreateRightAsync,
             };
 
-            Updater = new EntityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb>(PrepareUpdateAsync, UpdateAsync)
+            Updater = new EntityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb>(
+                PrepareUpdateAsync,
+                UpdateAsync,
+                x => new Result<Zemstvo>(x),
+                loggerFactory)
             {
                 ValidModel = ValidUpdateModelAsync,
                 ValidRight = ValidUpdateRightAsync,
             };
 
-            Deleter = new EntityOperationManager<Zemstvo, Guid, Result, SZDb>(PrepareDeleteAsync, DeleteAsync)
+            Deleter = new EntityOperationManager<Zemstvo, Guid, Result, SZDb>(
+                PrepareDeleteAsync,
+                DeleteAsync,
+                x => new Result(x),
+                loggerFactory)
             {
                 ValidRight = ValidDeleteRightAsync
             };
@@ -50,7 +62,8 @@ namespace SZ.Core
 
         #region Crate
         async ValueTask CreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Zemstvo entity, CancellationToken cancellationToken = default)
+            IUserSessionService userSessionService, Zemstvo entity,
+            CancellationToken cancellationToken = default)
         {
             var createResult = await dBProvider.DB.AddEntityAsync(entity, cancellationToken);
 
@@ -60,7 +73,8 @@ namespace SZ.Core
             result.AddError(createResult.UserMessage, createResult.AdminMessage, 500);
         }
         ValueTask<Zemstvo> PrepareCreateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, string name, CancellationToken cancellationToken)
+            IUserSessionService userSessionService, string name,
+            CancellationToken cancellationToken)
         {
             var newZemstvo = new Zemstvo
             {
@@ -109,7 +123,8 @@ namespace SZ.Core
 
         #region Update
         ValueTask<Zemstvo> PrepareUpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Zemstvo model, CancellationToken cancellationToken)
+            IUserSessionService userSessionService, Zemstvo model,
+            CancellationToken cancellationToken)
         {
             dBProvider.DB.Zemstvos.Attach(model);
 
@@ -117,7 +132,8 @@ namespace SZ.Core
         }
 
         async ValueTask ValidUpdateRightAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Zemstvo model, CancellationToken cancellationToken)
+            IUserSessionService userSessionService, Zemstvo model,
+            CancellationToken cancellationToken)
         {
             var currentUser = await _userManager.GetCurrentUserAsync(dBProvider, userSessionService, cancellationToken);
 
@@ -155,8 +171,9 @@ namespace SZ.Core
             else if (model.RequirePaperCircle == 0)
                 result.AddError("Неверно указан круг, с которого бумажные протоколы становятся обязательными", null, 203);
         }
-        async ValueTask UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Zemstvo entity, CancellationToken cancellationToken = default)
+        ValueTask UpdateAsync(Result<Zemstvo> result, IDBProvider<SZDb> dBProvider,
+            IUserSessionService userSessionService, Zemstvo entity,
+            CancellationToken cancellationToken = default)
         {
             dBProvider.DB.Zemstvos.Update(entity);
 
@@ -166,13 +183,15 @@ namespace SZ.Core
 
         #region Delete
         async ValueTask<Zemstvo> PrepareDeleteAsync(Result result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Guid model, CancellationToken cancellationToken)
+            IUserSessionService userSessionService, Guid model,
+            CancellationToken cancellationToken)
         {
             return await dBProvider.DB.Zemstvos.FindAsync(new object[] { model }, cancellationToken);
         }
 
         async ValueTask ValidDeleteRightAsync(Result result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Guid model, CancellationToken cancellationToken)
+            IUserSessionService userSessionService, Guid model,
+            CancellationToken cancellationToken)
         {
             var validCreateResult = new Result<Zemstvo>(_logger);
 
@@ -184,42 +203,17 @@ namespace SZ.Core
             result.AddError(validCreateResult.UserMessage, validCreateResult.AdminMessage, validCreateResult.ErrorCode);
         }
 
-        async ValueTask DeleteAsync(Result result, IDBProvider<SZDb> dBProvider,
-            IUserSessionService userSessionService, Zemstvo entity, CancellationToken cancellationToken = default)
+        ValueTask DeleteAsync(Result result, IDBProvider<SZDb> dBProvider,
+            IUserSessionService userSessionService, Zemstvo entity,
+            CancellationToken cancellationToken = default)
         {
             dBProvider.DB.Zemstvos.Remove(entity);
 
-            await dBProvider.DB.SaveChangesAsync();
+            dBProvider.DB.SaveChangesAsync();
+
+            return ValueTask.CompletedTask;
         }
         #endregion
-
-        //public async ValueTask<Result> DeleteAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, [NotNull] Guid id)
-        //{
-
-        //    Result result = new Result(_logger);
-        //    Zemstvo zemstvo = null;
-
-        //    try
-        //    {
-        //        zemstvo = await provider.DB.Zemstvos.FindAsync(id);
-
-        //        if (zemstvo != null)
-        //        {
-        //            var a = provider.DB.Zemstvos.Remove(zemstvo);
-
-        //            var deleteResult = await provider.DB.SaveChangesAsync();
-
-        //            if (deleteResult == 0)
-        //                return result.AddError("Земство не удалено", "При удалении земства в базе не произошло изменений");
-        //        }
-
-        //        return result.AddSuccess("Земство удалено", null, LogLevel.Information);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return result.AddError(e, "Ошибка удаления земства");
-        //    }
-        //}
 
         public Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
         {
