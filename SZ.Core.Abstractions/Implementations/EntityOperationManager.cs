@@ -32,6 +32,7 @@ namespace SZ.Core.Abstractions.Implementations
         public async Task OperationAsync(
             [NotNull] TResult result,
             [NotNull] IDBProvider<TDB> provider,
+            [NotNull] IUserSessionService userSessionService,
             [NotNull] TModel model,
             CancellationToken cancellationToken = default)
         {
@@ -44,18 +45,18 @@ namespace SZ.Core.Abstractions.Implementations
                 }
 
                 if (ValidRight != null)
-                    await ValidRight(result, provider, model, cancellationToken);
+                    await ValidRight(result, provider, userSessionService, model, cancellationToken);
 
                 if (!result.Success)
                     return;
 
                 if (ValidModel != null)
-                    await ValidModel(result, provider, model, cancellationToken);
+                    await ValidModel(result, provider, userSessionService, model, cancellationToken);
 
                 if (!result.Success)
                     return;
 
-                var entity = await Prepare(result, provider, model, cancellationToken);
+                var entity = await Prepare(result, provider, userSessionService, model, cancellationToken);
 
                 if (!result.Success)
                     return;
@@ -67,13 +68,13 @@ namespace SZ.Core.Abstractions.Implementations
                     return;
                 }
 
-                await DBAction(result, provider, entity, cancellationToken);
+                await DBAction(result, provider, userSessionService, entity, cancellationToken);
 
                 if (!result.Success)
                     return;
 
                 if (Post != null)
-                    await Post(result, provider, model, cancellationToken);
+                    await Post(result, provider, userSessionService, model, cancellationToken);
 
                 if (!result.Success)
                     return;

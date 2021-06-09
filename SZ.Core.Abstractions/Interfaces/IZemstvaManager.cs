@@ -20,6 +20,6 @@ namespace SZ.Core.Abstractions.Interfaces
         /// <returns></returns>
         Task<IQueryable<Zemstvo>> GetUserZemstvaAsync([NotNull] IDBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService);
 
-        //Task<IQueryable<Zemstvo>> GetAllZemstvaAsync([NotNull] DBProvider provider, IUserSessionService userSessionService);
+        Task<IQueryable<Zemstvo>> GetAllZemstvaAsync([NotNull] IDBProvider<SZDb> provider, IUserSessionService userSessionService);
     }
 }
