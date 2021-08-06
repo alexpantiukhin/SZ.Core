@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Al.Components.EF.Abstractions.Interfaces;
+using Al.Components.Identity.Abstractions.Interfaces;
+
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;

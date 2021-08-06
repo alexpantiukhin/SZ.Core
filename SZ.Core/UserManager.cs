@@ -1,4 +1,7 @@
 ﻿using Al;
+using Al.Components.EF.Abstractions.Interfaces;
+using Al.Components.Identity.Abstractions.Interfaces;
+using Al.Components.UserManager.Abstraction.Interfaces;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,7 +17,7 @@ using SZ.Core.Models.Db;
 
 namespace SZ.Core
 {
-    public class UserManager : IUserManager
+    public class UserManager : IUserManager<User, Guid, SZDb>
     {
         readonly ISZSingletonEnvironment _environment;
         readonly ILogger _logger;

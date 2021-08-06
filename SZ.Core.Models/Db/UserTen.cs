@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Al.Components.EF.Abstractions.Interfaces;
 
-using SZ.Core.Models.Interfaces;
+using System;
 
 namespace SZ.Core.Models.Db
 {

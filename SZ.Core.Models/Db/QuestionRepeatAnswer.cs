@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Al.Components.EF.Abstractions.Interfaces;
 
-using SZ.Core.Models.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace SZ.Core.Models.Db
 {

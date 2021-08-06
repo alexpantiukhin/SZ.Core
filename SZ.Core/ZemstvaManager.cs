@@ -1,4 +1,8 @@
 ﻿using Al;
+using Al.Components.EF.Abstractions.Implementation;
+using Al.Components.EF.Abstractions.Interfaces;
+using Al.Components.Identity.Abstractions.Interfaces;
+using Al.Components.UserManager.Abstraction.Interfaces;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,7 +13,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Abstractions.Interfaces;
 using SZ.Core.Models.Db;
 
@@ -17,14 +20,14 @@ namespace SZ.Core
 {
     public class ZemstvaManager : IZemstvaManager
     {
-        readonly IUserManager _userManager;
+        readonly IUserManager<User, Guid, SZDb> _userManager;
         readonly ILogger _logger;
 
         public IEntityOperationManager<Zemstvo, string, Result<Zemstvo>, SZDb> Creator { get; }
         public IEntityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb> Updater { get; }
         public IEntityOperationManager<Zemstvo, Guid, Result, SZDb> Deleter { get; }
 
-        public ZemstvaManager(IUserManager userManager, ILoggerFactory loggerFactory)
+        public ZemstvaManager(IUserManager<User, Guid, SZDb> userManager, ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
 
@@ -215,7 +218,7 @@ namespace SZ.Core
         }
         #endregion
 
-        public Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider provider, [NotNull] IUserSessionService userSessionService, int showId)
+        public Task<Zemstvo> GetZemstvoByShowId([NotNull] DBProvider<SZDb> provider, [NotNull] IUserSessionService userSessionService, int showId)
         {
             return provider.DB.Zemstvos.FirstOrDefaultAsync(x => x.ShowId == showId);
         }

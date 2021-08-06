@@ -1,4 +1,5 @@
 ﻿using Al;
+using Al.Components.EF.Abstractions.Interfaces;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -10,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using SZ.Core.Models.Configurations;
-using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {

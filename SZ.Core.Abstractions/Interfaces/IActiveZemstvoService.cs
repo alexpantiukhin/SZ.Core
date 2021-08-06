@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Al.Components.Identity.Abstractions.Interfaces;
+
+using Microsoft.EntityFrameworkCore;
 
 using System;
 using System.Threading.Tasks;

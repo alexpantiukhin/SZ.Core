@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Al.Components.EF.Abstractions.Implementation;
+using Al.Components.Identity.Abstractions.Interfaces;
+
+using Microsoft.EntityFrameworkCore;
 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Abstractions.Interfaces;
 using SZ.Core.Models.Db;
 
@@ -19,7 +21,7 @@ namespace SZ.Core
         public async Task Init(IUserSessionService userSessionService,
             IDbContextFactory<SZDb> dbContextFactory, IZemstvaManager zemstvaManager)
         {
-            var dbProvider = new DBProvider(dbContextFactory);
+            var dbProvider = new DBProvider<SZDb>(dbContextFactory);
 
             var zemstva = await zemstvaManager.GetUserZemstvaAsync(dbProvider, userSessionService);
 

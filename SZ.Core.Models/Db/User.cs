@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Al.Components.EF.Abstractions.Interfaces;
+
+using Microsoft.AspNetCore.Identity;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using SZ.Core.Models.Interfaces;
 
 namespace SZ.Core.Models.Db
 {
