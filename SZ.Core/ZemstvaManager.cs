@@ -27,6 +27,8 @@ namespace SZ.Core
         public IEntityOperationManager<Zemstvo, Zemstvo, Result<Zemstvo>, SZDb> Updater { get; }
         public IEntityOperationManager<Zemstvo, Guid, Result, SZDb> Deleter { get; }
 
+        private ZemstvaManager() { }
+
         public ZemstvaManager(IUserManager<User, Guid, SZDb> userManager, ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory?.CreateLogger<ZemstvaManager>();
