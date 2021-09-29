@@ -3,7 +3,7 @@
 using System;
 
 using SZ.Core.Models.Db;
-
+    
 namespace TestData
 {
     public class TestDBFactory : IDbContextFactory<SZDb>
