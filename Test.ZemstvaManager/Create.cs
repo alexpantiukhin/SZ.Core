@@ -34,7 +34,7 @@ namespace Test.ZemstvaManager
             var result = await _manager.Creator.OperationAsync(new DBProvider<SZDb>(factory), scopeEnvironment, zemstvoName);
 
             //assert
-            Assert.True(result.Success, "При создании админом земства результат должне быть успешным");
+            Assert.True(result.Success, "При создании админом земства результат должен быть успешным");
             Assert.True(result.Model != null, "При создании админом земства должна быть возвращена модель земства");
             Assert.True(result.Model?.Name == zemstvoName, "При создании админом земства должно быть возвращено именно создаваемое земство");
         }
