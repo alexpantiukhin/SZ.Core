@@ -1,15 +1,16 @@
-﻿using System.Security.Principal;
+﻿using Al.Components.Identity.Abstractions.Interfaces;
+
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
-using SZ.Core.Abstractions.Interfaces;
 using SZ.Core.Models.Db;
 
 namespace TestData
 {
     public class TestScopeEnvironment : IUserSessionService
     {
-        IIdentity Identity;
+        readonly IIdentity Identity;
         /// <summary>
         /// Пользователь не зашёл
         /// </summary>

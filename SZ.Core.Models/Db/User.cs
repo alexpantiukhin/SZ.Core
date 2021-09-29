@@ -1,4 +1,4 @@
-﻿using Al.Components.EF.Abstractions.Interfaces;
+﻿using Al.Components.DB.Interfaces;
 
 using Microsoft.AspNetCore.Identity;
 

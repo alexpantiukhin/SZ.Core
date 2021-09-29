@@ -75,59 +75,59 @@ namespace SZ.Core.Models.Db
             _withoutMigrations = withoutMigrations;
         }
 
-        public async ValueTask<Result> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
-        {
-            var result = new Result(_logger);
-            var saveCounter = 5;
-            try
-            {
-                var dbset = Set<T>();
+        //public async ValueTask<Result> AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IDBEntity
+        //{
+        //    var result = new Result(_logger);
+        //    var saveCounter = 5;
+        //    try
+        //    {
+        //        var dbset = Set<T>();
 
-                await dbset.AddAsync(entity, cancellationToken);
+        //        await dbset.AddAsync(entity, cancellationToken);
 
-                // даётся 5 попыток записать сущность
-                do
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        throw new TaskCanceledException();
+        //        // даётся 5 попыток записать сущность
+        //        do
+        //        {
+        //            if (cancellationToken.IsCancellationRequested)
+        //                throw new TaskCanceledException();
 
-                    int maxId;
+        //            int maxId;
 
-                    if (await dbset.AnyAsync(cancellationToken))
-                        maxId = await dbset.MaxAsync(x => x.ShowId, cancellationToken);
-                    else
-                        maxId = 0;
+        //            if (await dbset.AnyAsync(cancellationToken))
+        //                maxId = await dbset.MaxAsync(x => x.ShowId, cancellationToken);
+        //            else
+        //                maxId = 0;
 
-                    try
-                    {
-                        entity.ShowId = ++maxId;
+        //            try
+        //            {
+        //                entity.ShowId = ++maxId;
 
-                        await SaveChangesAsync(cancellationToken);
+        //                await SaveChangesAsync(cancellationToken);
 
-                        return result;
-                    }
-                    catch (TaskCanceledException e)
-                    {
-                        return result.AddError(e, "Операция отменена");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogWarning($"Неудачная попытка записать сущность {typeof(T).Name} id={entity.Id} c showId {maxId}");
-                    }
-                    saveCounter--;
-                } while (saveCounter > 0);
-            }
-            catch (TaskCanceledException e)
-            {
-                return result.AddError(e, "Операция отменена");
-            }
-            catch (Exception e)
-            {
-                return result.AddError(e, "Ошибка добавления сущности", 1, LogLevel.Error);
-            }
+        //                return result;
+        //            }
+        //            catch (TaskCanceledException e)
+        //            {
+        //                return result.AddError(e, "Операция отменена");
+        //            }
+        //            catch
+        //            {
+        //                _logger.LogWarning($"Неудачная попытка записать сущность {typeof(T).Name} id={entity.Id} c showId {maxId}");
+        //            }
+        //            saveCounter--;
+        //        } while (saveCounter > 0);
+        //    }
+        //    catch (TaskCanceledException e)
+        //    {
+        //        return result.AddError(e, "Операция отменена");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return result.AddError(e, "Ошибка добавления сущности", 1, LogLevel.Error);
+        //    }
 
-            return result.AddError($"Не удалось выполнить операцию с сущностью {typeof(T).Name} id={entity.Id} после {saveCounter} попыток");
-        }
+        //    return result.AddError($"Не удалось выполнить операцию с сущностью {typeof(T).Name} id={entity.Id} после {saveCounter} попыток");
+        //}
 
         public struct LengthRequirements
         {

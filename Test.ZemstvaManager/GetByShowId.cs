@@ -12,9 +12,9 @@ namespace Test.ZemstvaManager
 
     public class GetByShowId
     {
-        TestSingletonEnvironment environment = new TestSingletonEnvironment();
-        SZ.Core.ZemstvaManager _manager;
-        TestDBFactory factory = new TestDBFactory();
+        readonly TestSingletonEnvironment environment = new ();
+        readonly SZ.Core.ZemstvaManager _manager;
+        readonly TestDBFactory factory = new ();
 
         public GetByShowId()
         {

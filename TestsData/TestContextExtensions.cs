@@ -1,4 +1,6 @@
 ﻿
+using Al.Components.EF.Abstractions;
+
 using System;
 using System.Threading.Tasks;
 
@@ -48,7 +50,7 @@ namespace TestData
                 Email = Email
             };
 
-            await db.AddEntityAsync(user);
+            await Helper.AddShowIdEntityAsync(user, null, db, default);
 
             await db.SaveChangesAsync();
 

@@ -44,7 +44,7 @@ namespace SZ.Core.Constants
             }
             public const string AdminConcurrencyStamp = "8daaf047-c435-4e0e-8185-a941bbd96f75";
         }
-        public static PasswordOptions PasswordOptions => new PasswordOptions
+        public static PasswordOptions PasswordOptions => new ()
         {
             RequireDigit = true,
             RequiredLength = 5,

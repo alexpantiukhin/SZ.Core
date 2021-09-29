@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Al.Components.EF.Abstractions" Version="0.0.1" />
-    <PackageReference Include="Al.Result" Version="2.1.2" />
+    <PackageReference Include="Al.Components.EF.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Al.Result" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.6" />
   </ItemGroup>
 

@@ -24,7 +24,7 @@ namespace SZ.Core.Models.Db
             //};
 
             //builder.Entity<Zemstvo>().HasData(sz);
-            IdentityRole<Guid> roleAdmin = new IdentityRole<Guid>
+            IdentityRole<Guid> roleAdmin = new ()
             {
                 Id = Settings.Roles.AdminId,
                 Name = Settings.Users.AdminUserName,
@@ -34,7 +34,7 @@ namespace SZ.Core.Models.Db
 
             builder.Entity<IdentityRole<Guid>>().HasData(roleAdmin);
 
-            User admin = new User
+            User admin = new ()
             {
                 Id = Settings.Users.AdminId,
                 FirstName = Settings.Users.AdminUserName,
@@ -49,7 +49,7 @@ namespace SZ.Core.Models.Db
             };
             builder.Entity<User>().HasData(admin);
 
-            IdentityUserRole<Guid> userRole = new IdentityUserRole<Guid>
+            IdentityUserRole<Guid> userRole = new()
             {
                 RoleId = Settings.Roles.AdminId,
                 UserId = Settings.Users.AdminId

@@ -23,7 +23,11 @@ namespace SZ.Core
 
             services.AddScoped<IDbContextFactory<SZDb>, TDbFactory>();
 
-            services.AddScoped(x => { var factory = x.GetRequiredService<IDbContextFactory<SZDb>>(); return factory.CreateDbContext(); });
+            services.AddScoped(x =>
+            {
+                var factory = x.GetRequiredService<IDbContextFactory<SZDb>>();
+                return factory.CreateDbContext();
+            });
 
             services.AddScoped<IUserSessionService, TUserSession>();
             services.AddScoped<IActiveZemstvoService, ActiveZemstvoService>();

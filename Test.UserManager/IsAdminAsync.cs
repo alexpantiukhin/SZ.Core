@@ -1,9 +1,10 @@
+using Al.Components.EF.Abstractions.Implementation;
+
 using System.Threading.Tasks;
 
 using SZ.Core;
-using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Constants;
-using SZ.Core.Models;
+using SZ.Core.Models.Db;
 
 using TestData;
 
@@ -13,8 +14,8 @@ namespace SZ.Test.Core
 {
     public class IsAdminAsync
     {
-        TestDBFactory factory = new TestDBFactory();
-        TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
+        readonly TestDBFactory factory = new ();
+        readonly TestSingletonEnvironment singltoneEnv = new ();
         /// <summary>
         /// Пользователь не определён. Возвращает false
         /// </summary>
@@ -23,8 +24,8 @@ namespace SZ.Test.Core
         public async Task UserNotFoundReturnFalse()
         {
             //Arrange
-            var dbProvider = new DBProvider(factory);
-            var db = factory.CreateDbContext();
+            var dbProvider = new DBProvider<SZDb>(factory);
+
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -42,7 +43,7 @@ namespace SZ.Test.Core
         public async Task UserNotAdminReturnFalse()
         {
             //Arrange
-            var dbProvider = new DBProvider(factory);
+            var dbProvider = new DBProvider<SZDb>(factory);
             var userManager = new UserManager(singltoneEnv, null);
             await dbProvider.DB.AddUser(1);
 
@@ -62,7 +63,7 @@ namespace SZ.Test.Core
         public async Task UserIsAdminReturnTrue()
         {
             //Arrange
-            var dbProvider = new DBProvider(factory);
+            var dbProvider = new DBProvider<SZDb>(factory);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act

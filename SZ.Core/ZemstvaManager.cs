@@ -70,7 +70,7 @@ namespace SZ.Core
             IUserSessionService userSessionService, Zemstvo entity,
             CancellationToken cancellationToken = default)
         {
-            var createResult = await dBProvider.DB.AddEntityAsync(entity, cancellationToken);
+            var createResult = await Al.Components.EF.Abstractions.Helper.AddShowIdEntityAsync(entity, _logger, dBProvider.DB, cancellationToken);
 
             if (createResult.Success)
                 return;
@@ -182,7 +182,7 @@ namespace SZ.Core
         {
             dBProvider.DB.Zemstvos.Update(entity);
 
-            await dBProvider.DB.SaveChangesAsync();
+            await dBProvider.DB.SaveChangesAsync(cancellationToken);
         }
         #endregion
 
@@ -214,7 +214,7 @@ namespace SZ.Core
         {
             dBProvider.DB.Zemstvos.Remove(entity);
 
-            dBProvider.DB.SaveChangesAsync();
+            dBProvider.DB.SaveChangesAsync(cancellationToken);
 
             return ValueTask.CompletedTask;
         }

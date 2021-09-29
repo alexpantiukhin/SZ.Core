@@ -1,11 +1,12 @@
+using Al.Components.EF.Abstractions.Implementation;
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 using SZ.Core;
-using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Constants;
-using SZ.Core.Models;
+using SZ.Core.Models.Db;
 
 using TestData;
 
@@ -18,8 +19,8 @@ namespace SZ.Test.Core
     /// </summary>
     public class GeneratePasswordAsync
     {
-        TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
-        TestDBFactory DBFactory;
+        readonly TestSingletonEnvironment singltoneEnv = new ();
+        readonly TestDBFactory DBFactory;
         public GeneratePasswordAsync()
         {
             DBFactory = new TestDBFactory();
@@ -32,10 +33,10 @@ namespace SZ.Test.Core
         public async Task CurrentUserAdmin_ReturnNewPass()
         {
             //Arrange
-            var dbProvider = new DBProvider(DBFactory);
+            var dbProvider = new DBProvider<SZDb>(DBFactory);
             var user1 = await dbProvider.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            TestScopeEnvironment scopeEnvironment = new (Settings.Users.AdminUserName, true);
 
             var userManager = new UserManager(singltoneEnv, null);
 
@@ -55,10 +56,10 @@ namespace SZ.Test.Core
         public async Task CurrentUserSelfReturnNewPass()
         {
             //Arrange
-            var dbProvider = new DBProvider(DBFactory);
+            var dbProvider = new DBProvider<SZDb>(DBFactory);
             var user1 = await dbProvider.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(user1.UserName, true);
+            TestScopeEnvironment scopeEnvironment = new (user1.UserName, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -76,10 +77,10 @@ namespace SZ.Test.Core
         public async Task CurrentUserNotAuthReturnErrorModel()
         {
             //Arrange
-            var dbProvider = new DBProvider(DBFactory);
+            var dbProvider = new DBProvider<SZDb>(DBFactory);
             var user1 = await dbProvider.DB.AddUser(1);
             string testPassHash = user1.PasswordHash;
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(user1.UserName, false);
+            TestScopeEnvironment scopeEnvironment = new (user1.UserName, false);
 
             var userManager = new UserManager(singltoneEnv, null);
 
@@ -101,8 +102,8 @@ namespace SZ.Test.Core
         public async Task CurrentUserAdmin_ChangeUserNo_ReturnErrorModel()
         {
             //Arrange
-            var dbProvider = new DBProvider(DBFactory);
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(Settings.Users.AdminUserName, true);
+            var dbProvider = new DBProvider<SZDb>(DBFactory);
+            TestScopeEnvironment scopeEnvironment = new (Settings.Users.AdminUserName, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act

@@ -96,19 +96,18 @@ namespace SZ.Core
             }
         }
 
-
-        string GeneratePassword()
+        static string GeneratePassword()
         {
-            int length = Settings.PasswordOptions.RequiredLength;
+            int minLength = Settings.PasswordOptions.RequiredLength;
             bool nonAlphanumeric = Settings.PasswordOptions.RequireNonAlphanumeric;
             bool digit = Settings.PasswordOptions.RequireDigit;
             bool lowercase = Settings.PasswordOptions.RequireLowercase;
             bool uppercase = Settings.PasswordOptions.RequireUppercase;
 
-            StringBuilder password = new StringBuilder();
-            Random random = new Random();
+            StringBuilder password = new ();
+            Random random = new ();
 
-            while (password.Length < length)
+            while (password.Length < minLength)
             {
                 char c = (char)random.Next(32, 126);
 

@@ -63,15 +63,7 @@ namespace TestData
                 //    RoleId = Settings.Roles.AdminId
                 //});
 
-                try
-                {
-                    _SZDb.SaveChanges();
-
-                }
-                catch
-                {
-
-                }
+                _SZDb.SaveChanges();
 
             }
             catch (Exception e)

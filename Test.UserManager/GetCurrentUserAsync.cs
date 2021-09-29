@@ -1,8 +1,10 @@
+using Al.Components.EF.Abstractions.Implementation;
+
 using System.Threading.Tasks;
 
 using SZ.Core;
-using SZ.Core.Abstractions.Implementations;
 using SZ.Core.Models;
+using SZ.Core.Models.Db;
 
 using TestData;
 
@@ -12,9 +14,9 @@ namespace SZ.Test.Core
 {
     public class GetCurrentUserAsync
     {
-        TestDBFactory factory = new TestDBFactory();
-        TestSingletonEnvironment singltoneEnv = new TestSingletonEnvironment();
-        TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment();
+        readonly TestDBFactory factory = new ();
+        readonly TestSingletonEnvironment singltoneEnv = new ();
+        readonly TestScopeEnvironment scopeEnvironment = new ();
         /// <summary>
         /// Объект Identity не определён. Возвращает null
         /// </summary>
@@ -23,7 +25,7 @@ namespace SZ.Test.Core
         public async Task IdentityNullReturnNull()
         {
             //Arrange
-            var dbProvider = new DBProvider(factory);
+            var dbProvider = new DBProvider<SZDb>(factory);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -41,9 +43,9 @@ namespace SZ.Test.Core
         public async Task IdentityIsNotAuthReturnNull()
         {
             //Arrange
-            var dbProvider = new DBProvider(factory);
+            var dbProvider = new DBProvider<SZDb>(factory);
             var user = await dbProvider.DB.AddUser(1);
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(user);
+            TestScopeEnvironment scopeEnvironment = new (user);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -61,8 +63,8 @@ namespace SZ.Test.Core
         public async Task IdentityNotFoundReturnNull()
         {
             //Arrange
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment("User1", true);
-            var dbProvider = new DBProvider(factory);
+            TestScopeEnvironment scopeEnvironment = new ("User1", true);
+            var dbProvider = new DBProvider<SZDb>(factory);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
@@ -80,9 +82,9 @@ namespace SZ.Test.Core
         public async Task IdentityHasUserReturnUser()
         {
             //Arrange
-            var dbProvider = new DBProvider(factory);
+            var dbProvider = new DBProvider<SZDb>(factory);
             var user1 = await dbProvider.DB.AddUser(1);
-            TestScopeEnvironment scopeEnvironment = new TestScopeEnvironment(user1, true);
+            TestScopeEnvironment scopeEnvironment = new (user1, true);
             var userManager = new UserManager(singltoneEnv, null);
 
             //Act
